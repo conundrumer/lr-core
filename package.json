@@ -1,0 +1,16 @@
+{
+  "name": "lr-core",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-cli": "^6.6.5",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.7.0",
+    "tape": "^4.5.1"
+  }
+}
