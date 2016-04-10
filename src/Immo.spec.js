@@ -5,7 +5,7 @@ import Immo from './Immo.js'
 let testProps = {a: 'foo'}
 let testState = {b: 'bar', c: 'baz'}
 
-test('plain Immo from array', t => {
+test('plain Immo from array', (t) => {
   let Im = Immo(['a'], ['b', 'c'])
   let im = new Im(testProps, testState)
 
@@ -16,7 +16,7 @@ test('plain Immo from array', t => {
   t.end()
 })
 
-test('plain Immo from object', t => {
+test('plain Immo from object', (t) => {
   let Im = Immo(testProps, testState)
   let im = new Im(testProps, testState)
 
@@ -27,8 +27,7 @@ test('plain Immo from object', t => {
   t.end()
 })
 
-test('plain Immo update', t => {
-
+test('plain Immo update', (t) => {
   let Im = Immo(testProps, testState)
   let im1 = new Im(testProps, testState)
   let im2 = im1.update({b: 'bar2', c: 'baz2'})
@@ -52,7 +51,7 @@ test('plain Immo update', t => {
   t.end()
 })
 
-test('inherited Immo', t => {
+test('inherited Immo', (t) => {
   class MyClass extends Immo(testProps, testState) {
     foobar () {
       return this.a + this.b

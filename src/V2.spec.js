@@ -7,7 +7,7 @@ let v2 = {x: -2, y: 1}
 
 let almostEq = (a, b) => Math.abs(a - b) < 1e-9
 
-test('V2 wrapper', t => {
+test('V2 wrapper', (t) => {
   let v = V2(v1)
 
   t.equal(v.x, v1.x)
@@ -33,7 +33,7 @@ let scalarResults = {
 }
 for (let fn in scalarResults) {
   let expected = scalarResults[fn]
-  test(fn, t => {
+  test(fn, (t) => {
     t.equal(V2[fn], V2Fn[fn])
 
     let actual = V2[fn](v1, v2)
@@ -57,7 +57,7 @@ let vectorResults = {
 for (let fn in vectorResults) {
   let [arg, expected] = vectorResults[fn]
 
-  test(fn, t => {
+  test(fn, (t) => {
     let actual = V2(v1)[fn](arg)
     t.assert(almostEq(actual.x, expected.x))
     t.assert(almostEq(actual.y, expected.y))
@@ -66,14 +66,14 @@ for (let fn in vectorResults) {
   })
 }
 
-test('V2 equals', t => {
+test('V2 equals', (t) => {
   let v = V2(v1)
 
   t.assert(v.equals(v1))
   t.end()
 })
 
-test('V2 chainable', t => {
+test('V2 chainable', (t) => {
   t.assert(V2(v1).mul(2).div(2).equals(v1))
   t.end()
 })
