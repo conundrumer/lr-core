@@ -14,5 +14,9 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.7.0",
     "standard": "^6.0.8",
     "tape": "^4.5.1"
-  }
+  },
+  "dependencies": {
+    "immy": "^0.4.0"
+  },
+  "optionalDependencies": {}
 }
