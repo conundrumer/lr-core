@@ -1,53 +1,9 @@
 import Immy from 'immy'
 
-import Immo from './Immo.js'
+import Immo from '../Immo.js'
+
 import Frame from './Frame.js'
-
-function notImplemented (method) {
-  throw new TypeError(`${method.name} is not implemented`)
-}
-
-export class StateUpdate {
-  /**
-   * [constructor description]
-   * @param  {Array} updated [description]
-   * @param  {[type]} id      [description]
-   */
-  constructor (updated, id) {
-    this.updated = updated
-    if (id != null) {
-      this.id = id
-    }
-  }
-
-  get type () {
-    return this.constructor.name
-  }
-}
-
-class ConstraintUpdate extends StateUpdate {}
-
-class CollisionUpdate extends StateUpdate {
-  constructor (updated, id) {
-    super([updated], id)
-  }
-}
-
-export class Grid {
-  add (line) { notImplemented(this.add) }
-  remove (line) { notImplemented(this.remove) }
-  getCellsNearEntity (entity) { notImplemented(this.getCellsNearEntity) }
-  getLinesNearEntity (entity) { notImplemented(this.getLinesNearEntity) }
-}
-
-export class Line {
-  collide (entity) { notImplemented(this.collide) }
-  collidesWith (entity) { notImplemented(this.collidesWith) }
-}
-
-export class Constraint {
-  resolve (state) { notImplemented(this.resolve) }
-}
+import {ConstraintUpdate, CollisionUpdate} from './StateUpdate.js'
 
 function makeConstructorArgs ({constants, iterations} = {}) {
   return [{constants, iterations}, {
