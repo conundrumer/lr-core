@@ -1,5 +1,33 @@
+import Immy from 'immy'
 
-class Frame {
+class CellFrame {
+  constructor (index, entity) {
+    this.index = index
+    this.entities = [entity]
+  }
+  add (entity) {
+    this.entities.push(entity)
+  }
+  hasCollisionWith (line) {
+    return this.entities.some((entity) => line.collidesWith(entity))
+  }
+}
+
+function makeCellFrames (index, entity) {
+  return new Immy.List([new CellFrame(index, entity)])
+}
+
+function addEntityToCellFrames (cellFrames, index, entity) {
+  let cellFrame = cellFrames.get(cellFrames.size() - 1)
+  if (index === cellFrame.index) {
+    cellFrame.add(entity)
+    return cellFrames
+  } else {
+    return cellFrames.push(new CellFrame(index, entity))
+  }
+}
+
+export default class Frame {
   constructor (state = new Map(), grid = new Immy.Map(), collisions = new Immy.Map(), updates = []) {
     this.state = state
     this.grid = grid
@@ -13,13 +41,11 @@ class Frame {
 
   getIndexOfCollisionInCell (cell, line) {
     if (!this.grid.has(cell)) return
-    let gridCell = this.grid.get(cell)
-    for (let i = 0; i < gridCell.size(); i++) {
-      let {index, entities} = gridCell.get(i)
-      for (let entity of entities) {
-        if (line.collidesWith(entity)) {
-          return index
-        }
+    let cellFrames = this.grid.get(cell)
+    for (let i = 0; i < cellFrames.size(); i++) {
+      let cellFrame = cellFrames.get(i)
+      if (cellFrame.hasCollisionWith(line)) {
+        return cellFrame.index
       }
     }
   }
@@ -42,19 +68,13 @@ class Frame {
   addToGrid (lineGrid, entity, index) {
     let cells = lineGrid.getCellsNearEntity(entity)
     for (let cell of cells) {
-      let gridCell = this.grid.get(cell)
-      if (!gridCell) {
-        gridCell = new Immy.List([{index, entities: [entity]}])
+      let cellFrames = this.grid.get(cell)
+      if (!cellFrames) {
+        cellFrames = makeCellFrames(index, entity)
       } else {
-        let {index: lastIndex, entities} = gridCell.get(gridCell.size() - 1)
-        if (index !== lastIndex) {
-          entities = [entity]
-          gridCell = gridCell.push({index, entities})
-        } else {
-          entities.push(entity)
-        }
+        cellFrames = addEntityToCellFrames(cellFrames, index, entity)
       }
-      this.grid = this.grid.withKeySetToValue(cell, gridCell)
+      this.grid = this.grid.withKeySetToValue(cell, cellFrames)
     }
   }
 
