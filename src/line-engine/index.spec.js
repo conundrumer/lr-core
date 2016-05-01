@@ -134,6 +134,8 @@ class SimpleEngine extends LineEngine {
     }
     return new StepUpdate(updatedEntities)
   }
+
+  postIterate (state) {}
 }
 
 function logUpdates (engine, i) {

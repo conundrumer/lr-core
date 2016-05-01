@@ -1,6 +1,7 @@
 import Immy from 'immy'
 
 import Immo from '../Immo.js'
+import {abstractClass} from '../abstract-interface.js'
 
 import Frame from './Frame.js'
 import {ConstraintUpdate, CollisionUpdate} from './StateUpdate.js'
@@ -17,8 +18,8 @@ function makeConstructorArgs ({constants, iterations} = {}) {
     grid: null
   }]
 }
-export default class LineEngine extends Immo(...makeConstructorArgs()) {
-  makeGrid () { notImplemented(this.makeGrid) }
+class LineEngine extends Immo(...makeConstructorArgs()) {
+  makeGrid () {}
   preIterate (state) {}
   postIterate (state) {}
 
@@ -185,3 +186,5 @@ export default class LineEngine extends Immo(...makeConstructorArgs()) {
     return frame
   }
 }
+abstractClass('makeGrid', 'preIterate', 'postIterate')(LineEngine)
+export default LineEngine
