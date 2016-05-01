@@ -11,6 +11,7 @@
  * MyClass.constructor(props, state)
  * MyClass.update(nextState)
  *
+ * this would be nicer to user with decorators...
  */
 
 function defineProps (obj, keys, getPropsKey, setPropsKey) {
