@@ -6,8 +6,74 @@ function notImplemented (method) {
 }
 
 class Frame {
-  constructor (state = new Map(), updates = [], grid = new Immy.Map(), collisions = new Immy.Map()) {
-    Object.assign(this, {state, updates, grid, collisions})
+  constructor (state = new Map(), grid = new Immy.Map(), collisions = new Immy.Map(), updates = []) {
+    this.state = state
+    this.grid = grid
+    this.collisions = collisions
+    this.updates = updates
+  }
+
+  clone () {
+    return new Frame(new Map(this.state), this.grid, this.collisions)
+  }
+
+  getIndexOfCollisionInCell (cell, line) {
+    if (!this.grid.has(cell)) return
+    let gridCell = this.grid.get(cell)
+    for (let i = 0; i < gridCell.size(); i++) {
+      let {index, entities} = gridCell.get(i)
+      for (let entity of entities) {
+        if (line.collidesWith(entity)) {
+          return index
+        }
+      }
+    }
+  }
+
+  getIndexOfCollisionWithLine (line) {
+    let lineCollisions = this.collisions.get(line.id)
+    if (lineCollisions) {
+      return lineCollisions.get(0)
+    }
+  }
+
+  updateState (stateUpdate) {
+    if (!stateUpdate) return
+    this.updates.push(stateUpdate)
+    for (let nextEntity of stateUpdate.updated) {
+      this.state.set(nextEntity.id, nextEntity)
+    }
+  }
+
+  addToGrid (lineGrid, entity, index) {
+    let cells = lineGrid.getCellsNearEntity(entity)
+    for (let cell of cells) {
+      let gridCell = this.grid.get(cell)
+      if (!gridCell) {
+        gridCell = new Immy.List([{index, entities: [entity]}])
+      } else {
+        let {index: lastIndex, entities} = gridCell.get(gridCell.size() - 1)
+        if (index !== lastIndex) {
+          entities = [entity]
+          gridCell = gridCell.push({index, entities})
+        } else {
+          entities.push(entity)
+        }
+      }
+      this.grid = this.grid.withKeySetToValue(cell, gridCell)
+    }
+  }
+
+  addToCollisions (line, index) {
+    let lineCollisions = this.collisions.get(line.id)
+    if (!lineCollisions) {
+      lineCollisions = new Immy.List([index])
+    } else if (lineCollisions.get(lineCollisions.size() - 1) !== index) {
+      lineCollisions = lineCollisions.push(index)
+    } else {
+      return
+    }
+    this.collisions = this.collisions.withKeySetToValue(line.id, lineCollisions)
   }
 }
 
@@ -163,28 +229,19 @@ export default class LineEngine extends Immo(...makeConstructorArgs()) {
     this.linesMap.set(line.id, line)
     let cells = this.grid.add(line)
     for (let cell of cells) {
-      let gridCell = this._getLastFrame().grid.get(cell)
-      gridCell && (() => {
-        for (let i = 0; i < gridCell.size(); i++) {
-          let {index, entities} = gridCell.get(i)
-          for (let entity of entities) {
-            if (line.collidesWith(entity)) {
-              this._setFramesLength(index)
-              return
-            }
-          }
-        }
-      })()
+      let index = this._getLastFrame().getIndexOfCollisionInCell(cell, line)
+      if (index != null) {
+        this._setFramesLength(index)
+      }
     }
   }
 
   _removeLine (line) {
     this.linesMap.delete(line.id)
     this.grid.remove(line)
-    let lineCollisions = this._getLastFrame().collisions.get(line.id)
-    if (lineCollisions) {
-      let firstIndexOfCollision = lineCollisions.get(0)
-      this._setFramesLength(firstIndexOfCollision)
+    let index = this._getLastFrame().getIndexOfCollisionWithLine(line)
+    if (index != null) {
+      this._setFramesLength(index)
     }
   }
 
@@ -215,69 +272,30 @@ export default class LineEngine extends Immo(...makeConstructorArgs()) {
   }
 
   _getNextFrame (frame, index) {
-    let state = new Map(frame.state)
-    let stateUpdates = []
-    let {grid, collisions} = frame
-    let applyStateUpdate = (stateUpdate) => {
-      if (!stateUpdate) return
-      stateUpdates.push(stateUpdate)
-      for (let nextEntity of stateUpdate.updated) {
-        state.set(nextEntity.id, nextEntity)
-      }
-    }
-    let addToFrameGrid = (entity) => {
-      let cells = this.grid.getCellsNearEntity(entity)
-      for (let cell of cells) {
-        let gridCell = grid.get(cell)
-        if (!gridCell) {
-          gridCell = new Immy.List([{index, entities: [entity]}])
-        } else {
-          let {index: lastIndex, entities} = gridCell.get(gridCell.size() - 1)
-          if (index !== lastIndex) {
-            entities = [entity]
-            gridCell = gridCell.push({index, entities})
-          } else {
-            entities.push(entity)
-          }
-        }
-        grid = grid.withKeySetToValue(cell, gridCell)
-      }
-    }
-    let addToFrameCollisions = (line) => {
-      let lineCollisions = collisions.get(line.id)
-      if (!lineCollisions) {
-        lineCollisions = new Immy.List([index])
-      } else if (lineCollisions.get(lineCollisions.size() - 1) !== index) {
-        lineCollisions = lineCollisions.push(index)
-      } else {
-        return
-      }
-      collisions = collisions.withKeySetToValue(line.id, lineCollisions)
-    }
-
-    applyStateUpdate(this.preIterate(state))
+    frame = frame.clone()
+    frame.updateState(this.preIterate(frame.state))
     for (let i = 0; i < this.iterations; i++) {
       for (let constraint of this.constraints) {
-        applyStateUpdate(new ConstraintUpdate(constraint.resolve(state), constraint.id))
+        frame.updateState(new ConstraintUpdate(constraint.resolve(frame.state), constraint.id))
       }
       for (let id of this.collidables) {
-        let entity = state.get(id)
-        addToFrameGrid(entity)
+        let entity = frame.state.get(id)
+        frame.addToGrid(this.grid, entity, index)
 
         let lines = this.grid.getLinesNearEntity(entity)
         for (let line of lines) {
           let nextEntity = line.collide(entity)
           if (nextEntity) {
-            applyStateUpdate(new CollisionUpdate(nextEntity, line.id))
+            frame.updateState(new CollisionUpdate(nextEntity, line.id))
             entity = nextEntity
 
-            addToFrameGrid(entity)
-            addToFrameCollisions(line)
+            frame.addToGrid(this.grid, entity, index)
+            frame.addToCollisions(line, index)
           }
         }
       }
     }
-    applyStateUpdate(this.postIterate(state))
-    return new Frame(state, stateUpdates, grid, collisions)
+    frame.updateState(this.postIterate(frame.state))
+    return frame
   }
 }
