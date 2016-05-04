@@ -1,99 +1,38 @@
 import Immy from 'immy'
 
-import Immo from '../Immo.js'
+import Immo, {setupImmo} from '../Immo.js'
 import {abstractClass} from '../abstract-interface.js'
 
 import Frame from './Frame.js'
 import {ConstraintUpdate, CollisionUpdate} from './StateUpdate.js'
 
-function makeConstructorArgs ({constants, iterations} = {}) {
-  return [{constants, iterations}, {
-    linesList: new Immy.List(),
-    initState: new Map(),
-    constraints: []
-  }, {
-    linesMap: new Map(),
-    frames: [new Frame()],
-    collidables: [],
-    grid: null
-  }]
-}
-class LineEngine extends Immo(...makeConstructorArgs()) {
-  makeGrid () {}
-  preIterate (state) {}
-  postIterate (state) {}
-
-  constructor (props) {
-    super(...makeConstructorArgs(props))
-    this.grid = this.makeGrid()
+// @setupImmo
+// @abstractClass('makeGrid', 'preIterate', 'postIterate')
+export default class LineEngine extends Immo {
+  __props__ () {
+    return {
+      iterations: 1
+    }
   }
-
-  getLastFrameIndex () {
-    this._updateIfOutdated()
-    return this._getLastFrameIndex()
+  __state__ () {
+    return {
+      linesList: new Immy.List(),
+      initState: new Map(),
+      constraints: []
+    }
   }
-
-  getLastFrame () {
-    this._updateIfOutdated()
-    return this._getLastFrame()
+  __computed__ () {
+    return {
+      linesMap: new Map(),
+      frames: [new Frame()],
+      collidables: [],
+      grid: this.makeGrid()
+    }
   }
-
-  getStateAtFrame (index) {
-    this._updateIfOutdated()
-    this._computeFrame(index)
-    return this.frames[index].state
-  }
-
-  getUpdatesAtFrame (index) {
-    this._updateIfOutdated()
-    this._computeFrame(index)
-    return this.frames[index].updates
-  }
-
-  getLineByID (id) {
-    this._updateIfOutdated()
-    return this.linesMap.get(id)
-  }
-
-  addLine (line) {
-    this._updateIfOutdated()
-    let nextLinesList = this._modifyLinesList(line, (lines, line) => {
-      this._addLine(line)
-      let index = lines.findInsertionIndexWithBinarySearch((existing) => existing.id - line.id)
-      return lines.withValueAdded(index, line)
-    })
-    return this.update({linesList: nextLinesList})
-  }
-
-  removeLine (line) {
-    this._updateIfOutdated()
-    let nextLinesList = this._modifyLinesList(line, (lines, line) => {
-      this._removeLine(line)
-      let index = lines.findIndexWithBinarySearch((existing) => existing.id - line.id)
-      return lines.withValueRemoved(index, line)
-    })
-    return this.update({linesList: nextLinesList})
-  }
-
-  setInitState (state, debug) {
-    this._updateIfOutdated()
-    this._setFramesLength(1)
-    let initState = new Map(state.map((substate) => [substate.id, substate]))
-    this.collidables = state.filter(({collidable}) => collidable).map(({id}) => id)
-    this.frames[0] = new Frame(initState)
-    return this.update({initState})
-  }
-
-  setConstraints (constraints) {
-    this._updateIfOutdated()
-    this._setFramesLength(1)
-    return this.update({constraints: constraints.slice()})
-  }
-
-  _updateIfOutdated () {
-    super.updateIfOutdated({
-      linesList: (current) => {
-        let diff = current.linesList.compareTo(this.linesList)
+  __update__ () {
+    return {
+      linesList (targetLinesList, currentLinesList) {
+        let diff = currentLinesList.compareTo(targetLinesList)
         diff.forEachPrimitive((primOp) => {
           let line = primOp.value
           if (primOp instanceof Immy.ListPatches.Add) {
@@ -103,13 +42,78 @@ class LineEngine extends Immo(...makeConstructorArgs()) {
           }
         })
       },
-      initState: () => {
-        this.setInitState(Array.from(this.initState.values()), true)
+      initState (targetInitState) {
+        this.setInitState(Array.from(targetInitState.values()), true)
       },
-      constraints: () => {
-        this.setConstraints(this.constraints)
+      constraints (targetConstraints) {
+        this.setConstraints(targetConstraints)
       }
+    }
+  }
+  makeGrid () {}
+  preIterate (state) {}
+  postIterate (state) {}
+
+  getLastFrameIndex () {
+    this.updateComputed()
+    return this._getLastFrameIndex()
+  }
+
+  getLastFrame () {
+    this.updateComputed()
+    return this._getLastFrame()
+  }
+
+  getStateAtFrame (index) {
+    this.updateComputed()
+    this._computeFrame(index)
+    return this.frames[index].state
+  }
+
+  getUpdatesAtFrame (index) {
+    this.updateComputed()
+    this._computeFrame(index)
+    return this.frames[index].updates
+  }
+
+  getLineByID (id) {
+    this.updateComputed()
+    return this.linesMap.get(id)
+  }
+
+  addLine (line) {
+    this.updateComputed()
+    let nextLinesList = this._modifyLinesList(line, (lines, line) => {
+      this._addLine(line)
+      let index = lines.findInsertionIndexWithBinarySearch((existing) => existing.id - line.id)
+      return lines.withValueAdded(index, line)
     })
+    return this.updateState({linesList: nextLinesList})
+  }
+
+  removeLine (line) {
+    this.updateComputed()
+    let nextLinesList = this._modifyLinesList(line, (lines, line) => {
+      this._removeLine(line)
+      let index = lines.findIndexWithBinarySearch((existing) => existing.id - line.id)
+      return lines.withValueRemoved(index, line)
+    })
+    return this.updateState({linesList: nextLinesList})
+  }
+
+  setInitState (state, debug) {
+    this.updateComputed()
+    this._setFramesLength(1)
+    let initState = new Map(state.map((substate) => [substate.id, substate]))
+    this.collidables = state.filter(({collidable}) => collidable).map(({id}) => id)
+    this.frames[0] = new Frame(initState)
+    return this.updateState({initState})
+  }
+
+  setConstraints (constraints) {
+    this.updateComputed()
+    this._setFramesLength(1)
+    return this.updateState({constraints: constraints.slice()})
   }
 
   _addLine (line) {
@@ -186,5 +190,5 @@ class LineEngine extends Immo(...makeConstructorArgs()) {
     return frame
   }
 }
+setupImmo(LineEngine)
 abstractClass('makeGrid', 'preIterate', 'postIterate')(LineEngine)
-export default LineEngine

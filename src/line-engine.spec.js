@@ -119,8 +119,8 @@ class ExpandedGrid extends SimpleGrid {
  * - points can either move down or collide with line
  */
 class SimpleEngine extends LineEngine {
-  constructor (props) {
-    super(Object.assign({iterations: 2}, props))
+  constructor () {
+    super({props: {iterations: 2}})
   }
 
   makeGrid () {
