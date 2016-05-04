@@ -11,16 +11,16 @@ test('Immo subclass', (t) => {
 
   // @setupImmo
   class TestClass extends Immo {
-    get __props__ () {
-      return {a: 'a', b: 'b'}
+    __props__ () {
+      return {a: 'a', b: this.getB()}
     }
-    get __state__ () {
+    __state__ () {
       return {c: 'c', d: 'd'}
     }
-    get __computed__ () {
+    __computed__ () {
       return {e: 'e', f: 'f'}
     }
-    get __update__ () {
+    __update__ () {
       return {
         c (...args) {
           updateTester.ok(testUpdater(TestClass, this, ...args), '__update__.c')
@@ -32,6 +32,9 @@ test('Immo subclass', (t) => {
     }
     bar () {
       this.updateComputed()
+    }
+    getB () {
+      return 'b'
     }
   }
   setupImmo(TestClass)
@@ -55,42 +58,46 @@ test('Immo subsubclass', (t) => {
 
   // @setupImmo
   class TestClass extends Immo {
-    get __props__ () {
+    __props__ () {
       return {a: 'a'}
     }
-    get __state__ () {
+    __state__ () {
       return {c: 'c'}
     }
-    get __computed__ () {
-      return {e: 'e'}
+    __computed__ () {
+      return {e: this.getE()}
     }
-    get __update__ () {
+    __update__ () {
       return {
         c (...args) {
           updateTester.ok(testUpdater(TestClass, this, ...args), '__update__.c')
         }
       }
     }
+    getE () {}
   }
   setupImmo(TestClass)
 
   // @setupImmo
   class SubTestClass extends TestClass {
-    get __props__ () {
+    __props__ () {
       return {b: 'b'}
     }
-    get __state__ () {
+    __state__ () {
       return {d: 'd'}
     }
-    get __computed__ () {
+    __computed__ () {
       return {f: 'f'}
     }
-    get __update__ () {
+    __update__ () {
       return {
         d (...args) {
           updateTester.fail()
         }
       }
+    }
+    getE () {
+      return 'e'
     }
   }
   setupImmo(SubTestClass)
@@ -106,16 +113,16 @@ test('Immo subsubclass variation', (t) => {
 
   // @setupImmo
   class TestClass extends Immo {
-    get __props__ () {
+    __props__ () {
       return {b: 'b'}
     }
-    get __state__ () {
+    __state__ () {
       return {d: 'd'}
     }
-    get __computed__ () {
+    __computed__ () {
       return {f: 'f'}
     }
-    get __update__ () {
+    __update__ () {
       return {
         d (...args) {
           updateTester.fail()
@@ -127,16 +134,16 @@ test('Immo subsubclass variation', (t) => {
 
   // @setupImmo
   class SubTestClass extends TestClass {
-    get __props__ () {
+    __props__ () {
       return {a: 'a'}
     }
-    get __state__ () {
+    __state__ () {
       return {c: 'c'}
     }
-    get __computed__ () {
+    __computed__ () {
       return {e: 'e'}
     }
-    get __update__ () {
+    __update__ () {
       return {
         c (...args) {
           updateTester.ok(testUpdater(SubTestClass, this, ...args), '__update__.c')
@@ -157,16 +164,16 @@ test('Immo empty subsubclass', (t) => {
 
   // @setupImmo
   class TestClass extends Immo {
-    get __props__ () {
+    __props__ () {
       return {a: 'a', b: 'b'}
     }
-    get __state__ () {
+    __state__ () {
       return {c: 'c', d: 'd'}
     }
-    get __computed__ () {
+    __computed__ () {
       return {e: 'e', f: 'f'}
     }
-    get __update__ () {
+    __update__ () {
       return {
         c (...args) {
           updateTester.ok(testUpdater(TestClass, this, ...args), '__update__.c')

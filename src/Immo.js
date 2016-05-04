@@ -20,13 +20,13 @@
  */
 
 export default class Immo {
-  static get __props__ () {
+  static __props__ () {
     return {}
   }
-  static get __state__ () {
+  static __state__ () {
     return {}
   }
-  static get __computed__ () {
+  static __computed__ () {
     return {}
   }
   static get __update__ () {
@@ -43,13 +43,13 @@ export default class Immo {
         set: (next) => { current = next }
       },
       __props__: {
-        value: Object.assign(new.target.__props__, props)
+        value: Object.assign(new.target.__props__.call(this), props)
       },
       __state__: {
-        value: Object.assign(new.target.__state__, state)
+        value: Object.assign(new.target.__state__.call(this), state)
       },
       __computed__: {
-        value: Object.assign(new.target.__computed__, computed)
+        value: Object.assign(new.target.__computed__.call(this), computed)
       }
     })
   }
@@ -97,9 +97,9 @@ function makeImmoAccessors (Subclass) {
   let defineImmoAccessors = (obj, getPropsKey, setPropsKey) =>
     defineAccessors(Subclass.prototype, Object.keys(obj), getPropsKey, setPropsKey)
 
-  defineImmoAccessors(Subclass.__props__, (key) => function () { return this.__props__[key] })
-  defineImmoAccessors(Subclass.__state__, (key) => function () { return this.__state__[key] })
-  defineImmoAccessors(Subclass.__computed__,
+  defineImmoAccessors(Subclass.__props__.call(Subclass.prototype), (key) => function () { return this.__props__[key] })
+  defineImmoAccessors(Subclass.__state__.call(Subclass.prototype), (key) => function () { return this.__state__[key] })
+  defineImmoAccessors(Subclass.__computed__.call(Subclass.prototype),
     (key) => function () { return this.__computed__[key] },
     (key) => function (value) { this.__computed__[key] = value }
   )
@@ -109,16 +109,22 @@ function makeImmoStaticProps (Subclass) {
   let Superclass = Object.getPrototypeOf(Subclass)
   Object.defineProperties(Subclass, {
     __props__: {
-      get: () => Object.assign(Superclass.__props__, Subclass.prototype.__props__)
+      value () {
+        return Object.assign(Superclass.__props__.call(this), Subclass.prototype.__props__.call(this))
+      }
     },
     __state__: {
-      get: () => Object.assign(Superclass.__state__, Subclass.prototype.__state__)
+      value () {
+        return Object.assign(Superclass.__state__.call(this), Subclass.prototype.__state__.call(this))
+      }
     },
     __computed__: {
-      get: () => Object.assign(Superclass.__computed__, Subclass.prototype.__computed__)
+      value () {
+        return Object.assign(Superclass.__computed__.call(this), Subclass.prototype.__computed__.call(this))
+      }
     },
     __update__: {
-      value: Object.assign({}, Superclass.__update__, Subclass.prototype.__update__)
+      value: Object.assign({}, Superclass.__update__, Subclass.prototype.__update__())
     }
   })
 }
