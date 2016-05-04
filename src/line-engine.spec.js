@@ -1,6 +1,6 @@
 import test from 'tape'
 
-import LineEngine, {Line, Constraint, Grid, StateUpdate} from './index'
+import LineEngine, {Line, Constraint, Grid, StateUpdate} from './line-engine'
 
 class StepUpdate extends StateUpdate {}
 

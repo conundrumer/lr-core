@@ -25,6 +25,9 @@ unit-test: $(TEST_RESULT_FILES)
 $(TEST)/%.tap: $(BUILD)/%.spec.js $(BUILD)/%.js
 	mkdir -p $(@D)
 	$(TEST_CMD) $< > $@ && ([ $$? -eq 0 ]) || (echo '\n'$@ && cat $@)
+$(TEST)/%.tap: $(BUILD)/%.spec.js $(BUILD)/%/*.js $(BUILD)/%/**/*.js
+	mkdir -p $(@D)
+	$(TEST_CMD) $< > $@ && ([ $$? -eq 0 ]) || (echo '\n'$@ && cat $@)
 
 clean: clean-build clean-test
 clean-build:
