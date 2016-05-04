@@ -65,14 +65,15 @@ export default class Immo {
   updateComputed () {
     if (this !== this.__current__) {
       let updateFns = this.constructor.__update__
+      let current = this.__current__
+      this.__current__ = this
       for (let stateKey in updateFns) {
         let targetState = this[stateKey]
-        let currentState = this.__current__[stateKey]
+        let currentState = current[stateKey]
         if (currentState !== targetState) {
-          updateFns[stateKey](targetState, currentState, this.__current__)
+          updateFns[stateKey].call(this, targetState, currentState, current)
         }
       }
-      this.__current__ = this
     }
   }
 }

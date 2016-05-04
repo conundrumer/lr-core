@@ -2,6 +2,9 @@ import test from 'tape'
 
 import Immo, {setupImmo} from './Immo.js'
 
+let testUpdater = (TestClass, self, target, current, currentThis) =>
+  target !== current && self instanceof TestClass && currentThis instanceof TestClass
+
 test('Immo subclass', (t) => {
   let updateTester
   let setUpdateTester = (t) => { updateTester = t }
@@ -19,16 +22,29 @@ test('Immo subclass', (t) => {
     }
     get __update__ () {
       return {
-        c: (target, current, currentThis) =>
-          updateTester.ok(target !== current, '__update__.c is called when there is difference'),
-        d: (target, current, currentThis) =>
-          updateTester.ok(target !== current, '__update__.d is called when there is difference')
+        c (...args) {
+          updateTester.ok(testUpdater(TestClass, this, ...args), '__update__.c')
+        },
+        d (...args) {
+          this.bar()
+        }
       }
+    }
+    bar () {
+      this.updateComputed()
     }
   }
   setupImmo(TestClass)
 
   runTest(t, TestClass, setUpdateTester)
+
+  t.test('no infinite mutual recursion with updateComputed', (t) => {
+    let foo1 = new TestClass()
+    let foo2 = foo1.updateState({d: 'd2'})
+    foo1.bar()
+    foo2.bar()
+    t.end()
+  })
 
   t.end()
 })
@@ -50,8 +66,9 @@ test('Immo subsubclass', (t) => {
     }
     get __update__ () {
       return {
-        c: (target, current) =>
-          updateTester.ok(target !== current, '__update__.c is called when there is difference')
+        c (...args) {
+          updateTester.ok(testUpdater(TestClass, this, ...args), '__update__.c')
+        }
       }
     }
   }
@@ -70,8 +87,9 @@ test('Immo subsubclass', (t) => {
     }
     get __update__ () {
       return {
-        d: (target, current) =>
-          updateTester.ok(target !== current, '__update__.d is called when there is difference')
+        d (...args) {
+          updateTester.fail()
+        }
       }
     }
   }
@@ -99,8 +117,9 @@ test('Immo subsubclass variation', (t) => {
     }
     get __update__ () {
       return {
-        d: (target, current) =>
-          updateTester.ok(target !== current, '__update__.d is called when there is difference')
+        d (...args) {
+          updateTester.fail()
+        }
       }
     }
   }
@@ -119,12 +138,48 @@ test('Immo subsubclass variation', (t) => {
     }
     get __update__ () {
       return {
-        c: (target, current) =>
-          updateTester.ok(target !== current, '__update__.c is called when there is difference')
+        c (...args) {
+          updateTester.ok(testUpdater(SubTestClass, this, ...args), '__update__.c')
+        }
       }
     }
   }
   setupImmo(SubTestClass)
+
+  runTest(t, SubTestClass, setUpdateTester)
+
+  t.end()
+})
+
+test('Immo empty subsubclass', (t) => {
+  let updateTester
+  let setUpdateTester = (t) => { updateTester = t }
+
+  // @setupImmo
+  class TestClass extends Immo {
+    get __props__ () {
+      return {a: 'a', b: 'b'}
+    }
+    get __state__ () {
+      return {c: 'c', d: 'd'}
+    }
+    get __computed__ () {
+      return {e: 'e', f: 'f'}
+    }
+    get __update__ () {
+      return {
+        c (...args) {
+          updateTester.ok(testUpdater(TestClass, this, ...args), '__update__.c')
+        },
+        d (...args) {
+          updateTester.fail()
+        }
+      }
+    }
+  }
+  setupImmo(TestClass)
+
+  class SubTestClass extends TestClass {}
 
   runTest(t, SubTestClass, setUpdateTester)
 
