@@ -1,174 +1,209 @@
 import test from 'tape'
 
-import Immo from './Immo.js'
+import Immo, {setupImmo} from './Immo.js'
 
-let testProps = {a: 'foo'}
-let testState = {b: 'bar', c: 'baz'}
-let testComputed = {d: 42}
+test('Immo subclass', (t) => {
+  let updateTester
+  let setUpdateTester = (t) => { updateTester = t }
 
-test('plain Immo from array', (t) => {
-  let Im = Immo(['a'], ['b', 'c'], ['d'])
-  let im = new Im(testProps, testState, testComputed)
+  // @setupImmo
+  class TestClass extends Immo {
+    get __props__ () {
+      return {a: 'a', b: 'b'}
+    }
+    get __state__ () {
+      return {c: 'c', d: 'd'}
+    }
+    get __computed__ () {
+      return {e: 'e', f: 'f'}
+    }
+    get __update__ () {
+      return {
+        c: (target, current, currentThis) =>
+          updateTester.ok(target !== current, '__update__.c is called when there is difference'),
+        d: (target, current, currentThis) =>
+          updateTester.ok(target !== current, '__update__.d is called when there is difference')
+      }
+    }
+  }
+  setupImmo(TestClass)
 
-  t.equal(im.a, 'foo')
-  t.equal(im.b, 'bar')
-  t.equal(im.c, 'baz')
-  t.equal(im.d, 42)
+  runTest(t, TestClass, setUpdateTester)
 
   t.end()
 })
 
-test('plain Immo from object', (t) => {
-  let Im = Immo(testProps, testState, testComputed)
-  let im = new Im(testProps, testState, testComputed)
+test('Immo subsubclass', (t) => {
+  let updateTester
+  let setUpdateTester = (t) => { updateTester = t }
 
-  t.equal(im.a, 'foo')
-  t.equal(im.b, 'bar')
-  t.equal(im.c, 'baz')
-  t.equal(im.d, 42)
+  // @setupImmo
+  class TestClass extends Immo {
+    get __props__ () {
+      return {a: 'a'}
+    }
+    get __state__ () {
+      return {c: 'c'}
+    }
+    get __computed__ () {
+      return {e: 'e'}
+    }
+    get __update__ () {
+      return {
+        c: (target, current) =>
+          updateTester.ok(target !== current, '__update__.c is called when there is difference')
+      }
+    }
+  }
+  setupImmo(TestClass)
+
+  // @setupImmo
+  class SubTestClass extends TestClass {
+    get __props__ () {
+      return {b: 'b'}
+    }
+    get __state__ () {
+      return {d: 'd'}
+    }
+    get __computed__ () {
+      return {f: 'f'}
+    }
+    get __update__ () {
+      return {
+        d: (target, current) =>
+          updateTester.ok(target !== current, '__update__.d is called when there is difference')
+      }
+    }
+  }
+  setupImmo(SubTestClass)
+
+  runTest(t, SubTestClass, setUpdateTester)
 
   t.end()
 })
 
-function testVersioning (t, im1, im2) {
-  t.test('versions', (t) => {
-    t.plan(4)
-    im2.updateIfOutdated({
-      b () {
-        t.fail('im3 should not be outdated')
+test('Immo subsubclass variation', (t) => {
+  let updateTester
+  let setUpdateTester = (t) => { updateTester = t }
+
+  // @setupImmo
+  class TestClass extends Immo {
+    get __props__ () {
+      return {b: 'b'}
+    }
+    get __state__ () {
+      return {d: 'd'}
+    }
+    get __computed__ () {
+      return {f: 'f'}
+    }
+    get __update__ () {
+      return {
+        d: (target, current) =>
+          updateTester.ok(target !== current, '__update__.d is called when there is difference')
       }
-    })
-    im1.updateIfOutdated({
-      b (im) {
-        t.pass('im1 is outdated')
-        t.equal(im, im2, 'current version is im3')
+    }
+  }
+  setupImmo(TestClass)
+
+  // @setupImmo
+  class SubTestClass extends TestClass {
+    get __props__ () {
+      return {a: 'a'}
+    }
+    get __state__ () {
+      return {c: 'c'}
+    }
+    get __computed__ () {
+      return {e: 'e'}
+    }
+    get __update__ () {
+      return {
+        c: (target, current) =>
+          updateTester.ok(target !== current, '__update__.c is called when there is difference')
       }
+    }
+  }
+  setupImmo(SubTestClass)
+
+  runTest(t, SubTestClass, setUpdateTester)
+
+  t.end()
+})
+
+function runTest (t, TestClass, setUpdateTester) {
+  const getValues = ({a, b, c, d, e, f}) => ({a, b, c, d, e, f})
+  const defaultValues = {a: 'a', b: 'b', c: 'c', d: 'd', e: 'e', f: 'f'}
+  const customValues = {a: 'a1', b: 'b', c: 'c1', d: 'd', e: 'e1', f: 'f'}
+
+  t.test('default instantiation', (t) => {
+    let foo1 = new TestClass()
+    let foo2 = foo1.updateState({c: 'c2'})
+
+    t.deepEqual(getValues(foo1), defaultValues, 'foo1: default')
+
+    t.deepEqual(getValues(foo2), Object.assign({}, defaultValues, {c: 'c2'}), 'foo2: c updated')
+
+    t.comment('modify computed')
+    foo1.e = 'e2'
+    t.equal(foo1.e, 'e2', 'foo1 computed modified')
+    t.equal(foo2.e, 'e2', 'foo2 computed modified')
+
+    t.test('update computed', (t) => {
+      t.plan(1)
+      setUpdateTester(t)
+      foo1.updateComputed()
+      foo1.updateComputed()
     })
-    im1.updateIfOutdated({
-      c () {
-        t.fail('im1 should not be outdated')
-      }
+
+    t.end()
+  })
+
+  t.test('instantiation w given props', (t) => {
+    let foo1 = new TestClass({
+      props: {a: 'a1'},
+      state: {c: 'c1'},
+      computed: {e: 'e1'}
     })
-    im2.updateIfOutdated({
-      c (im) {
-        t.pass('im3 is outdated')
-        t.equal(im, im1, 'current version is im1')
-      }
+    let foo2 = foo1.updateState({c: 'c2'})
+    let foo3 = foo2.updateState({c: 'c3'})
+
+    t.deepEqual(getValues(foo1), customValues, 'foo1: init')
+
+    t.deepEqual(getValues(foo2), Object.assign({}, customValues, {c: 'c2'}), 'foo2: c updated')
+
+    t.deepEqual(getValues(foo3), Object.assign({}, customValues, {c: 'c3'}), 'foo3: c updated')
+
+    t.comment('modify computed')
+    foo2.e = 'c2'
+    t.equal(foo1.e, 'c2', 'foo1 computed modified')
+    t.equal(foo2.e, 'c2', 'foo2 computed modified')
+    t.equal(foo3.e, 'c2', 'foo3 computed modified')
+
+    t.test('update computed', (t) => {
+      t.plan(3)
+      setUpdateTester(t)
+      foo3.updateComputed()
+      t.test('foo1', (t) => {
+        t.plan(1)
+        setUpdateTester(t)
+        foo1.updateComputed()
+        foo1.updateComputed()
+      })
+      t.test('foo2', (t) => {
+        t.plan(1)
+        setUpdateTester(t)
+        foo2.updateComputed()
+        foo2.updateComputed()
+      })
+      t.test('foo3', (t) => {
+        t.plan(1)
+        setUpdateTester(t)
+        foo3.updateComputed()
+        foo3.updateComputed()
+      })
     })
+
+    t.end()
   })
 }
-
-test('plain Immo update', (t) => {
-  let Im = Immo(testProps, testState, testComputed)
-  let im1 = new Im(testProps, testState, testComputed)
-  let im2 = im1.update({b: 'bar2', c: 'baz2'})
-  let im3 = im2.update({c: 'baz3'})
-  im3.d = 43
-
-  t.comment('im1')
-  t.equal(im1.a, 'foo')
-  t.equal(im1.b, 'bar')
-  t.equal(im1.c, 'baz')
-  t.equal(im1.d, 43)
-
-  t.comment('im2')
-  t.equal(im2.a, 'foo')
-  t.equal(im2.b, 'bar2')
-  t.equal(im2.c, 'baz2')
-  t.equal(im2.d, 43)
-
-  t.comment('im3')
-  t.equal(im3.a, 'foo')
-  t.equal(im3.b, 'bar2')
-  t.equal(im3.c, 'baz3')
-  t.equal(im3.d, 43)
-
-  testVersioning(t, im1, im3)
-
-  t.end()
-})
-
-test('inherited Immo', (t) => {
-  class MyClass extends Immo(testProps, testState, testComputed) {
-    foobar () {
-      return this.a + this.b
-    }
-  }
-
-  let im1 = new MyClass(testProps, testState, testComputed)
-  let im2 = im1.update({b: 'bar2', c: 'baz2'})
-  let im3 = im2.update({b: 'bar3', c: 'baz3'})
-  im3.d = 43
-
-  t.comment('im1')
-  t.equal(im1.a, 'foo')
-  t.equal(im1.b, 'bar')
-  t.equal(im1.c, 'baz')
-  t.equal(im1.foobar(), 'foobar')
-  t.equal(im1.d, 43)
-
-  t.comment('im2')
-  t.equal(im2.a, 'foo')
-  t.equal(im2.b, 'bar2')
-  t.equal(im2.c, 'baz2')
-  t.equal(im2.foobar(), 'foobar2')
-  t.equal(im2.d, 43)
-
-  t.comment('im3')
-  t.equal(im3.a, 'foo')
-  t.equal(im3.b, 'bar3')
-  t.equal(im3.c, 'baz3')
-  t.equal(im3.foobar(), 'foobar3')
-  t.equal(im3.d, 43)
-
-  testVersioning(t, im1, im3)
-
-  t.end()
-})
-
-test('inherited*2 Immo', (t) => {
-  class ClassOne extends Immo(testProps, testState, testComputed) {
-    foobar () {
-      return this.a + this.b
-    }
-  }
-
-  class ClassTwo extends ClassOne {
-    asdf () {
-      return this.b + this.c
-    }
-  }
-
-  let im1 = new ClassTwo(testProps, testState, testComputed)
-  let im2 = im1.update({b: 'bar2', c: 'baz2'})
-  let im3 = im2.update({b: 'bar3', c: 'baz3'})
-  im3.d = 43
-
-  t.comment('im1')
-  t.equal(im1.a, 'foo')
-  t.equal(im1.b, 'bar')
-  t.equal(im1.c, 'baz')
-  t.equal(im1.foobar(), 'foobar')
-  t.equal(im1.asdf(), 'barbaz')
-  t.equal(im1.d, 43)
-
-  t.comment('im2')
-  t.equal(im2.a, 'foo')
-  t.equal(im2.b, 'bar2')
-  t.equal(im2.c, 'baz2')
-  t.equal(im2.foobar(), 'foobar2')
-  t.equal(im2.asdf(), 'bar2baz2')
-  t.equal(im2.d, 43)
-
-  t.comment('im3')
-  t.equal(im3.a, 'foo')
-  t.equal(im3.b, 'bar3')
-  t.equal(im3.c, 'baz3')
-  t.equal(im3.foobar(), 'foobar3')
-  t.equal(im3.asdf(), 'bar3baz3')
-  t.equal(im3.d, 43)
-
-  testVersioning(t, im1, im3)
-
-  t.end()
-})
