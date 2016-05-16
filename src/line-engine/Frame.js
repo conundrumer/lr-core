@@ -59,6 +59,9 @@ export default class Frame {
 
   updateState (stateUpdate) {
     if (!stateUpdate) return
+    if (stateUpdate instanceof Array) {
+      return stateUpdate.forEach((update) => this.updateState(update))
+    }
     this.updates.push(stateUpdate)
     for (let nextEntity of stateUpdate.updated) {
       this.state.set(nextEntity.id, nextEntity)
