@@ -101,7 +101,7 @@ export default class LineEngine extends Immo {
     return this.updateState({linesList: nextLinesList})
   }
 
-  setInitState (state, debug) {
+  setInitState (state) {
     this.updateComputed()
     this._setFramesLength(1)
     let initState = new Map(state.map((substate) => [substate.id, substate]))
