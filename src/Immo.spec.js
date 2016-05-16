@@ -59,7 +59,7 @@ test('Immo subsubclass', (t) => {
   // @setupImmo
   class TestClass extends Immo {
     __props__ () {
-      return {a: 'a'}
+      return {a: 'a', b: -1}
     }
     __state__ () {
       return {c: 'c'}
@@ -114,7 +114,7 @@ test('Immo subsubclass variation', (t) => {
   // @setupImmo
   class TestClass extends Immo {
     __props__ () {
-      return {b: 'b'}
+      return {b: 'b', a: -1}
     }
     __state__ () {
       return {d: 'd'}
