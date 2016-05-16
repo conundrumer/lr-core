@@ -1,6 +1,6 @@
 import {interfaceClass} from '../abstract-interface.js'
 
-class Grid {
+export class Grid {
   add (line) {}
   remove (line) {}
   getCellsNearEntity (entity) {}
@@ -8,15 +8,13 @@ class Grid {
 }
 interfaceClass(Grid)
 
-class Line {
+export class Line {
   collide (entity) {}
   collidesWith (entity) {}
 }
 interfaceClass(Line)
 
-class Constraint {
+export class Constraint {
   resolve (state) {}
 }
 interfaceClass(Constraint)
-
-export {Grid, Line, Constraint}
