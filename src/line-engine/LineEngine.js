@@ -17,7 +17,7 @@ export default class LineEngine extends Immo {
   __state__ () {
     return {
       linesList: new Immy.List(),
-      initState: new Map(),
+      initialStateMap: new Map(),
       constraints: []
     }
   }
@@ -42,8 +42,8 @@ export default class LineEngine extends Immo {
           }
         })
       },
-      initState (targetInitState) {
-        this.setInitState(Array.from(targetInitState.values()), true)
+      initialStateMap (targetInitState) {
+        this.setInitialStates(Array.from(targetInitState.values()), true)
       },
       constraints (targetConstraints) {
         this.setConstraints(targetConstraints)
@@ -51,8 +51,8 @@ export default class LineEngine extends Immo {
     }
   }
   makeGrid () {}
-  preIterate (state) {}
-  postIterate (state) {}
+  preIterate (stateMap) {}
+  postIterate (stateMap) {}
 
   getLastFrameIndex () {
     this.updateComputed()
@@ -64,10 +64,10 @@ export default class LineEngine extends Immo {
     return this._getLastFrame()
   }
 
-  getStateAtFrame (index) {
+  getStateMapAtFrame (index) {
     this.updateComputed()
     this._computeFrame(index)
-    return this.frames[index].state
+    return this.frames[index].stateMap
   }
 
   getUpdatesAtFrame (index) {
@@ -101,13 +101,14 @@ export default class LineEngine extends Immo {
     return this.updateState({linesList: nextLinesList})
   }
 
-  setInitState (state) {
+  // state: array of {id, collidable, ...}
+  setInitialStates (stateArray) {
     this.updateComputed()
     this._setFramesLength(1)
-    let initState = new Map(state.map((substate) => [substate.id, substate]))
-    this.collidables = state.filter(({collidable}) => collidable).map(({id}) => id)
-    this.frames[0] = new Frame(initState)
-    return this.updateState({initState})
+    let initialStateMap = new Map(stateArray.map((substate) => [substate.id, substate]))
+    this.collidables = stateArray.filter(({collidable}) => collidable).map(({id}) => id)
+    this.frames[0] = new Frame(initialStateMap)
+    return this.updateState({initialStateMap})
   }
 
   setConstraints (constraints) {
@@ -164,20 +165,20 @@ export default class LineEngine extends Immo {
 
   _getNextFrame (frame, index) {
     frame = frame.clone()
-    frame.updateState(this.preIterate(frame.state))
+    frame.updateStateMap(this.preIterate(frame.stateMap))
     for (let i = 0; i < this.iterations; i++) {
       for (let constraint of this.constraints) {
-        frame.updateState(new ConstraintUpdate(constraint.resolve(frame.state), constraint.id))
+        frame.updateStateMap(new ConstraintUpdate(constraint.resolve(frame.stateMap), constraint.id))
       }
       for (let id of this.collidables) {
-        let entity = frame.state.get(id)
+        let entity = frame.stateMap.get(id)
         frame.addToGrid(this.grid, entity, index)
 
         let lines = this.grid.getLinesNearEntity(entity)
         for (let line of lines) {
           let nextEntity = line.collide(entity)
           if (nextEntity) {
-            frame.updateState(new CollisionUpdate(nextEntity, line.id))
+            frame.updateStateMap(new CollisionUpdate(nextEntity, line.id))
             entity = nextEntity
 
             frame.addToGrid(this.grid, entity, index)
@@ -186,7 +187,7 @@ export default class LineEngine extends Immo {
         }
       }
     }
-    frame.updateState(this.postIterate(frame.state))
+    frame.updateStateMap(this.postIterate(frame.stateMap))
     return frame
   }
 }

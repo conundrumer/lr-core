@@ -31,9 +31,9 @@ class SimpleConstraint extends Constraint {
     Object.assign(this, {id, p1, p2})
   }
 
-  resolve (state) {
-    let p1 = state.get(this.p1)
-    let p2 = state.get(this.p2)
+  resolve (stateMap) {
+    let p1 = stateMap.get(this.p1)
+    let p2 = stateMap.get(this.p2)
     let y = Math.min(p1.y, p2.y)
     return [
       Object.assign({}, p1, {y}),
@@ -127,15 +127,15 @@ class SimpleEngine extends LineEngine {
     return new NoGrid()
   }
 
-  preIterate (state) {
+  preIterate (stateMap) {
     let updatedEntities = []
-    for (let {id, x, y, collidable} of state.values()) {
+    for (let {id, x, y, collidable} of stateMap.values()) {
       updatedEntities.push({id, x, y: y + 1, collidable})
     }
     return new StepUpdate(updatedEntities)
   }
 
-  postIterate (state) {}
+  postIterate (stateMap) {}
 }
 
 function logUpdates (engine, i) {
@@ -263,12 +263,12 @@ test('SimpleEngine', (t) => {
         .addLine(lines)
 
       t.test('setting init', (t) => {
-        engine = engine.setInitState(testStates[0])
+        engine = engine.setInitialStates(testStates[0])
 
-        let state = engine.getStateAtFrame(0)
+        let stateMap = engine.getStateMapAtFrame(0)
 
         testStates[0].forEach((point) => {
-          t.deepEqual(state.get(point.id), point)
+          t.deepEqual(stateMap.get(point.id), point)
         })
 
         t.end()
@@ -276,13 +276,13 @@ test('SimpleEngine', (t) => {
 
       t.test('stepping', (t) => {
         for (let i = 1; i < testStates.length; i++) {
-          let state = engine.getStateAtFrame(i)
+          let stateMap = engine.getStateMapAtFrame(i)
           // logUpdates(engine, i)
 
           t.comment(`state ${i}`)
           testStates[i].forEach((point) => {
             t.comment(`point ${point.id}`)
-            t.deepEqual(state.get(point.id), point)
+            t.deepEqual(stateMap.get(point.id), point)
           })
         }
 
@@ -384,7 +384,7 @@ test('SimpleEngine', (t) => {
       ].map(([x0, x1, y], id) => new SimpleLine(id, x0, x1, y))
 
       let engine = new Engine()
-        .setInitState([
+        .setInitialStates([
           {id: 0, x: 0, y: 0, collidable: true}, {id: 1, x: 1, y: 0, collidable: true}
         ])
         .setConstraints([new SimpleConstraint(0, 0, 1)]);
@@ -419,9 +419,9 @@ test('SimpleEngine', (t) => {
         engine = fn(engine)
         // console.log('after', engine, engine.addLines)
 
-        let state = engine.getStateAtFrame(3)
-        t.deepEqual(state.get(0), {id: 0, x: 0, y: expectedY, collidable: true})
-        t.deepEqual(state.get(1), {id: 1, x: 1, y: expectedY, collidable: true})
+        let stateMap = engine.getStateMapAtFrame(3)
+        t.deepEqual(stateMap.get(0), {id: 0, x: 0, y: expectedY, collidable: true})
+        t.deepEqual(stateMap.get(1), {id: 1, x: 1, y: expectedY, collidable: true})
 
         return engine
       }, engine)
@@ -457,22 +457,22 @@ test('SimpleEngine', (t) => {
     let engine1 = new SimpleEngine()
 
     let engine2 = engine1.setConstraints([{id: 0, resolve: () => []}])
-    let engine3 = engine2.setInitState([{id: 0}, {id: 1}])
+    let engine3 = engine2.setInitialStates([{id: 0}, {id: 1}])
 
-    let state = engine1.getStateAtFrame(41)
-    t.deepEqual(state.get(0), undefined)
-    t.deepEqual(state.get(1), undefined)
+    let stateMap = engine1.getStateMapAtFrame(41)
+    t.deepEqual(stateMap.get(0), undefined)
+    t.deepEqual(stateMap.get(1), undefined)
 
-    state = engine2.getStateAtFrame(0)
+    stateMap = engine2.getStateMapAtFrame(0)
     t.equal(engine2.frames.length, 1, 'resetting state should have resetted computed frames')
-    t.deepEqual(state.get(0), undefined)
-    t.deepEqual(state.get(1), undefined)
-    state = engine2.getStateAtFrame(41)
+    t.deepEqual(stateMap.get(0), undefined)
+    t.deepEqual(stateMap.get(1), undefined)
+    stateMap = engine2.getStateMapAtFrame(41)
 
-    state = engine3.getStateAtFrame(0)
+    stateMap = engine3.getStateMapAtFrame(0)
     t.equal(engine3.frames.length, 1, 'resetting constraints should have resetted computed frames')
-    t.deepEqual(state.get(0), {id: 0})
-    t.deepEqual(state.get(1), {id: 1})
+    t.deepEqual(stateMap.get(0), {id: 0})
+    t.deepEqual(stateMap.get(1), {id: 1})
 
     t.end()
   })

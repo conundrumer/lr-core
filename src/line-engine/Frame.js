@@ -28,15 +28,15 @@ function addEntityToCellFrames (cellFrames, index, entity) {
 }
 
 export default class Frame {
-  constructor (state = new Map(), grid = new Immy.Map(), collisions = new Immy.Map(), updates = []) {
-    this.state = state
+  constructor (stateMap = new Map(), grid = new Immy.Map(), collisions = new Immy.Map(), updates = []) {
+    this.stateMap = stateMap
     this.grid = grid
     this.collisions = collisions
     this.updates = updates
   }
 
   clone () {
-    return new Frame(new Map(this.state), this.grid, this.collisions)
+    return new Frame(new Map(this.stateMap), this.grid, this.collisions)
   }
 
   getIndexOfCollisionInCell (cell, line) {
@@ -57,14 +57,14 @@ export default class Frame {
     }
   }
 
-  updateState (stateUpdate) {
+  updateStateMap (stateUpdate) {
     if (!stateUpdate) return
     if (stateUpdate instanceof Array) {
-      return stateUpdate.forEach((update) => this.updateState(update))
+      return stateUpdate.forEach((update) => this.updateStateMap(update))
     }
     this.updates.push(stateUpdate)
     for (let nextEntity of stateUpdate.updated) {
-      this.state.set(nextEntity.id, nextEntity)
+      this.stateMap.set(nextEntity.id, nextEntity)
     }
   }
 
