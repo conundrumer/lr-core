@@ -28,16 +28,21 @@ $(BUILD)/%.json: $(SRC)/%.json
 
 unit-test: $(TEST_RESULT_FILES)
 $(TEST)/%.tap: $(BUILD)/%.spec.js $(BUILD)/%.js
-	@echo Test: $< \> $@
+	@printf "Test: $< > $@"
 	@mkdir -p $(@D)
-	@$(TEST_CMD) $< > $@ 2>> $@ && ([ $$? -eq 0 ]) || cat $@
+	@$(TEST_CMD) $< > $@ 2>> $@ && ([ $$? -eq 0 ] && printf " PASSED\n") || (printf " FAILED\n" && cat $@)
 $(TEST)/%.tap: $(BUILD)/%.spec.js $(BUILD)/%/*.js $(BUILD)/%/**/*.js
-	@echo Test: $< \> $@
+	@printf "Test: $< > $@"
 	@mkdir -p $(@D)
-	@$(TEST_CMD) $< > $@ 2>> $@ && ([ $$? -eq 0 ]) || cat $@
+	@$(TEST_CMD) $< > $@ 2>> $@ && ([ $$? -eq 0 ] && printf " PASSED\n") || (printf " FAILED\n" && cat $@)
 
 clean: clean-build clean-test
 clean-build:
 	rm -r $(BUILD)
 clean-test:
 	rm -r $(TEST)
+
+watch:
+	@echo Watching for changes...
+	@fswatch $(SRC) | xargs -n1 -I{} make
+
