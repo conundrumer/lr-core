@@ -107,6 +107,7 @@ function makeImmoAccessors (Subclass) {
 
 function makeImmoStaticProps (Subclass) {
   let Superclass = Object.getPrototypeOf(Subclass)
+  let update = Subclass.prototype.__update__
   Object.defineProperties(Subclass, {
     __props__: {
       value () {
@@ -124,7 +125,7 @@ function makeImmoStaticProps (Subclass) {
       }
     },
     __update__: {
-      value: Object.assign({}, Superclass.__update__, Subclass.prototype.__update__())
+      value: Object.assign({}, Superclass.__update__, update && update())
     }
   })
 }
