@@ -16,6 +16,8 @@ export default class StateUpdate {
   }
 }
 
+export class StepUpdate extends StateUpdate {}
+
 export class ConstraintUpdate extends StateUpdate {}
 
 export class CollisionUpdate extends StateUpdate {

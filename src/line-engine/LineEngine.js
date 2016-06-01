@@ -1,31 +1,37 @@
 import Immy from 'immy'
 
 import Immo, {setupImmo} from '../Immo.js'
-import {abstractClass} from '../abstract-interface.js'
+// import {abstractClass} from '../abstract-interface.js'
 
 import Frame from './Frame.js'
-import {ConstraintUpdate, CollisionUpdate} from './StateUpdate.js'
+import {StepUpdate, ConstraintUpdate, CollisionUpdate} from './StateUpdate.js'
 
 // @setupImmo
 // @abstractClass('makeGrid', 'preIterate', 'postIterate')
 export default class LineEngine extends Immo {
   __props__ () {
     return {
-      iterations: 1
+      iterations: 1,
+      stepOptions: {}
     }
   }
   __state__ () {
     return {
       linesList: new Immy.List(),
       initialStateMap: new Map(),
-      constraints: []
+      constraints: new Map()
     }
   }
   __computed__ () {
     return {
       linesMap: new Map(),
       frames: [new Frame()],
+      // state IDs
+      steppables: [],
       collidables: [],
+      // constraint IDs
+      iterating: [],
+      noniterating: [],
       grid: this.makeGrid()
     }
   }
@@ -43,16 +49,14 @@ export default class LineEngine extends Immo {
         })
       },
       initialStateMap (targetInitState) {
-        this.setInitialStates(Array.from(targetInitState.values()), true)
+        this.setInitialStates(Array.from(targetInitState.values()))
       },
       constraints (targetConstraints) {
-        this.setConstraints(targetConstraints)
+        this.setConstraints(Array.from(targetConstraints.values()))
       }
     }
   }
   makeGrid () {}
-  preIterate (stateMap) {}
-  postIterate (stateMap) {}
 
   getLastFrameIndex () {
     this.updateComputed()
@@ -105,8 +109,9 @@ export default class LineEngine extends Immo {
   setInitialStates (stateArray) {
     this.updateComputed()
     this._setFramesLength(1)
-    let initialStateMap = new Map(stateArray.map((substate) => [substate.id, substate]))
+    this.steppables = stateArray.filter(({steppable}) => steppable).map(({id}) => id)
     this.collidables = stateArray.filter(({collidable}) => collidable).map(({id}) => id)
+    let initialStateMap = new Map(stateArray.map((state) => [state.id, state]))
     this.frames[0] = new Frame(initialStateMap)
     return this.updateState({initialStateMap})
   }
@@ -114,7 +119,10 @@ export default class LineEngine extends Immo {
   setConstraints (constraints) {
     this.updateComputed()
     this._setFramesLength(1)
-    return this.updateState({constraints: constraints.slice()})
+    this.iterating = constraints.filter(({iterating}) => iterating).map(({id}) => id)
+    this.noniterating = constraints.filter(({iterating}) => !iterating).map(({id}) => id)
+    let constraintsMap = new Map(constraints.map((constraint) => [constraint.id, constraint]))
+    return this.updateState({constraints: constraintsMap})
   }
 
   _addLine (line) {
@@ -163,33 +171,52 @@ export default class LineEngine extends Immo {
     }
   }
 
+  // step -> (resolve <-> collide) -> endResolve
   _getNextFrame (frame, index) {
     frame = frame.clone()
-    frame.updateStateMap(this.preIterate(frame.stateMap))
+
+    this._stepStates(frame, this.steppables)
     for (let i = 0; i < this.iterations; i++) {
-      for (let constraint of this.constraints) {
-        frame.updateStateMap(new ConstraintUpdate(constraint.resolve(frame.stateMap), constraint.id))
-      }
-      for (let id of this.collidables) {
-        let entity = frame.stateMap.get(id)
-        frame.addToGrid(this.grid, entity, index)
+      this._resolveConstraints(frame, this.iterating)
+      this._collideEntities(frame, this.collidables, index)
+    }
+    this._resolveConstraints(frame, this.noniterating)
+    return frame
+  }
 
-        let lines = this.grid.getLinesNearEntity(entity)
-        for (let line of lines) {
-          let nextEntity = line.collide(entity)
-          if (nextEntity) {
-            frame.updateStateMap(new CollisionUpdate(nextEntity, line.id))
-            entity = nextEntity
+  _stepStates (frame, stateIDs) {
+    let updatedStates = stateIDs.map((id) => (
+      frame.stateMap.get(id).step(this.stepOptions)
+      )
+    )
+    frame.updateStateMap(new StepUpdate(updatedStates))
+  }
 
-            frame.addToGrid(this.grid, entity, index)
-            frame.addToCollisions(line, index)
-          }
+  _resolveConstraints (frame, constraintIDs) {
+    for (let id of constraintIDs) {
+      let constraint = this.constraints.get(id)
+      frame.updateStateMap(new ConstraintUpdate(constraint.resolve(frame.stateMap), id))
+    }
+  }
+
+  _collideEntities (frame, stateIDs, index) {
+    for (let id of stateIDs) {
+      let entity = frame.stateMap.get(id)
+      frame.addToGrid(this.grid, entity, index)
+
+      let lines = this.grid.getLinesNearEntity(entity)
+      for (let line of lines) {
+        let nextEntity = line.collide(entity)
+        if (nextEntity) {
+          frame.updateStateMap(new CollisionUpdate(nextEntity, line.id))
+          entity = nextEntity
+
+          frame.addToGrid(this.grid, entity, index)
+          frame.addToCollisions(line, index)
         }
       }
     }
-    frame.updateStateMap(this.postIterate(frame.stateMap))
-    return frame
   }
 }
 setupImmo(LineEngine)
-abstractClass('makeGrid', 'preIterate', 'postIterate')(LineEngine)
+// abstractClass('makeGrid', 'preIterate', 'postIterate')(LineEngine)

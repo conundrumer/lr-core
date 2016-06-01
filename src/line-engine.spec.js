@@ -1,12 +1,26 @@
 import test from 'tape'
 
-import LineEngine, {Line, Constraint, Grid, StateUpdate} from './line-engine'
+import LineEngine from './line-engine'
 
-class StepUpdate extends StateUpdate {}
+class SimpleState {
+  constructor ({id, x, y, collidable = false}) {
+    Object.assign(this, {id, x, y, collidable})
+  }
+  clone () {
+    return new SimpleState(this)
+  }
+  get steppable () {
+    return true
+  }
+  step () {
+    let next = this.clone()
+    next.y += 1
+    return next
+  }
+}
 
-class SimpleLine extends Line {
+class SimpleLine {
   constructor (id, x0, x1, y) {
-    super()
     Object.assign(this, {id, x0, x1, y})
   }
 
@@ -16,35 +30,38 @@ class SimpleLine extends Line {
 
   collide (entity) {
     if (this.collidesWith(entity)) {
-      // console.log('COLLISION')
-      return Object.assign({}, entity, {y: entity.y - 1})
+      entity = entity.clone()
+      entity.y -= 1
+      return entity
     } else {
-      // console.log('no collision')
     }
     return null
   }
 }
 
-class SimpleConstraint extends Constraint {
+class SimpleConstraint {
+  get iterating () {
+    return true
+  }
   constructor (id, p1, p2) {
-    super()
     Object.assign(this, {id, p1, p2})
   }
 
   resolve (stateMap) {
     let p1 = stateMap.get(this.p1)
     let p2 = stateMap.get(this.p2)
+    if (!p1 || !p2) return []
+    p1 = p1.clone()
+    p2 = p2.clone()
     let y = Math.min(p1.y, p2.y)
-    return [
-      Object.assign({}, p1, {y}),
-      Object.assign({}, p2, {y})
-    ]
+    p1.y = y
+    p2.y = y
+    return [p1, p2]
   }
 }
 
-class NoGrid extends Grid {
+class NoGrid {
   constructor () {
-    super()
     this.lines = new Set()
   }
   add (line) {
@@ -62,9 +79,8 @@ class NoGrid extends Grid {
   }
 }
 
-class SimpleGrid extends Grid {
+class SimpleGrid {
   constructor () {
-    super()
     this.grid = new Map()
   }
   toCell (x, y) {
@@ -126,23 +142,13 @@ class SimpleEngine extends LineEngine {
   makeGrid () {
     return new NoGrid()
   }
-
-  preIterate (stateMap) {
-    let updatedEntities = []
-    for (let {id, x, y, collidable} of stateMap.values()) {
-      updatedEntities.push({id, x, y: y + 1, collidable})
-    }
-    return new StepUpdate(updatedEntities)
-  }
-
-  postIterate (stateMap) {}
 }
 
-function logUpdates (engine, i) {
-  let updates = engine.getUpdatesAtFrame(i)
-  updates = updates.map((update) => Object.assign({type: update.type}, update))
-  console.log(`updates: ${JSON.stringify(updates, null, 2)}`)
-}
+// function logUpdates (engine, i) {
+//   let updates = engine.getUpdatesAtFrame(i)
+//   updates = updates.map((update) => Object.assign({type: update.type}, update))
+//   console.log(`updates: ${JSON.stringify(updates, null, 2)}`)
+// }
 
 test('SimpleEngine', (t) => {
   /*
@@ -254,7 +260,7 @@ test('SimpleEngine', (t) => {
       constraints: testConstraints = []
     }) {
       testStates = testStates.map((states) => states.map(([x, y], id) => (
-        {id, x, y, collidable: collidables[id]}
+        new SimpleState({id, x, y, collidable: collidables[id]})
       )))
       testConstraints = testConstraints.map(([p1, p2], id) => new SimpleConstraint(id, p1, p2))
 
@@ -385,7 +391,8 @@ test('SimpleEngine', (t) => {
 
       let engine = new Engine()
         .setInitialStates([
-          {id: 0, x: 0, y: 0, collidable: true}, {id: 1, x: 1, y: 0, collidable: true}
+          new SimpleState({id: 0, x: 0, y: 0, collidable: true}),
+          new SimpleState({id: 1, x: 1, y: 0, collidable: true})
         ])
         .setConstraints([new SimpleConstraint(0, 0, 1)]);
 
@@ -415,9 +422,7 @@ test('SimpleEngine', (t) => {
       }].reduce((engine, {fn, expectedY}, i) => {
         t.comment(`version ${i}`)
 
-        // console.log('before', engine, engine.addLines)
         engine = fn(engine)
-        // console.log('after', engine, engine.addLines)
 
         let stateMap = engine.getStateMapAtFrame(3)
         t.deepEqual(stateMap.get(0), {id: 0, x: 0, y: expectedY, collidable: true})
@@ -456,8 +461,11 @@ test('SimpleEngine', (t) => {
   t.test('immutable setting state and constraints', (t) => {
     let engine1 = new SimpleEngine()
 
-    let engine2 = engine1.setConstraints([{id: 0, resolve: () => []}])
-    let engine3 = engine2.setInitialStates([{id: 0}, {id: 1}])
+    let engine2 = engine1.setConstraints([new SimpleConstraint(0, 0, 1)])
+    let engine3 = engine2.setInitialStates([
+      new SimpleState({id: 0, x: 0, y: 0}),
+      new SimpleState({id: 1, x: 0, y: 0})
+    ])
 
     let stateMap = engine1.getStateMapAtFrame(41)
     t.deepEqual(stateMap.get(0), undefined)
@@ -471,8 +479,8 @@ test('SimpleEngine', (t) => {
 
     stateMap = engine3.getStateMapAtFrame(0)
     t.equal(engine3.frames.length, 1, 'resetting constraints should have resetted computed frames')
-    t.deepEqual(stateMap.get(0), {id: 0})
-    t.deepEqual(stateMap.get(1), {id: 1})
+    t.deepEqual(stateMap.get(0), {id: 0, x: 0, y: 0, collidable: false})
+    t.deepEqual(stateMap.get(1), {id: 1, x: 0, y: 0, collidable: false})
 
     t.end()
   })
