@@ -94,12 +94,13 @@ function defineAccessors (obj, keys, getPropsKey, setPropsKey) {
 }
 
 function makeImmoAccessors (Subclass) {
-  let defineImmoAccessors = (obj, getPropsKey, setPropsKey) =>
-    defineAccessors(Subclass.prototype, Object.keys(obj), getPropsKey, setPropsKey)
+  let defineImmoAccessors = (getObj, getPropsKey, setPropsKey) =>
+    !getObj ? null
+    : defineAccessors(Subclass.prototype, Object.keys(getObj.call(Subclass.prototype)), getPropsKey, setPropsKey)
 
-  defineImmoAccessors(Subclass.__props__.call(Subclass.prototype), (key) => function () { return this.__props__[key] })
-  defineImmoAccessors(Subclass.__state__.call(Subclass.prototype), (key) => function () { return this.__state__[key] })
-  defineImmoAccessors(Subclass.__computed__.call(Subclass.prototype),
+  defineImmoAccessors(Subclass.__props__, (key) => function () { return this.__props__[key] })
+  defineImmoAccessors(Subclass.__state__, (key) => function () { return this.__state__[key] })
+  defineImmoAccessors(Subclass.__computed__,
     (key) => function () { return this.__computed__[key] },
     (key) => function (value) { this.__computed__[key] = value }
   )
@@ -107,25 +108,32 @@ function makeImmoAccessors (Subclass) {
 
 function makeImmoStaticProps (Subclass) {
   let Superclass = Object.getPrototypeOf(Subclass)
-  let update = Subclass.prototype.__update__
-  Object.defineProperties(Subclass, {
-    __props__: {
+  let propObj = {}
+  if (Subclass.prototype.__props__) {
+    propObj.__props__ = {
       value () {
         return Object.assign(Superclass.__props__.call(this), Subclass.prototype.__props__.call(this))
       }
-    },
-    __state__: {
+    }
+  }
+  if (Subclass.prototype.__state__) {
+    propObj.__state__ = {
       value () {
         return Object.assign(Superclass.__state__.call(this), Subclass.prototype.__state__.call(this))
       }
-    },
-    __computed__: {
+    }
+  }
+  if (Subclass.prototype.__computed__) {
+    propObj.__computed__ = {
       value () {
         return Object.assign(Superclass.__computed__.call(this), Subclass.prototype.__computed__.call(this))
       }
-    },
-    __update__: {
-      value: Object.assign({}, Superclass.__update__, update && update())
     }
-  })
+  }
+  if (Subclass.prototype.__update__) {
+    propObj.__update__ = {
+      value: Object.assign({}, Superclass.__update__, Subclass.prototype.__update__())
+    }
+  }
+  Object.defineProperties(Subclass, propObj)
 }

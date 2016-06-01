@@ -107,7 +107,7 @@ test('Immo subsubclass', (t) => {
   t.end()
 })
 
-test('Immo subsubclass variation (without __update__)', (t) => {
+test('Immo subsubclass variation (without __update__ or __computed__)', (t) => {
   let updateTester
   let setUpdateTester = (t) => { updateTester = t }
 
@@ -119,9 +119,9 @@ test('Immo subsubclass variation (without __update__)', (t) => {
     __state__ () {
       return {d: 'd'}
     }
-    __computed__ () {
-      return {f: 'f'}
-    }
+    // __computed__ () {
+    //   return {f: 'f'}
+    // }
     // __update__ () {
     //   return {
     //     d (...args) {
@@ -141,7 +141,7 @@ test('Immo subsubclass variation (without __update__)', (t) => {
       return {c: 'c'}
     }
     __computed__ () {
-      return {e: 'e'}
+      return {e: 'e', f: 'f'}
     }
     __update__ () {
       return {
