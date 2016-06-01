@@ -1,64 +1,51 @@
 {
-  "points": {
-    "collidable": [
-      { "id": "PEG"      , "x": 0    , "y": 0    , "friction": 0.8 },
-      { "id": "TAIL"     , "x": 0    , "y": 5    , "friction": 0   },
-      { "id": "NOSE"     , "x": 15   , "y": 5    , "friction": 0   },
-      { "id": "STRING"   , "x": 17.5 , "y": 0    , "friction": 0   },
-      { "id": "BUTT"     , "x": 5    , "y": 0    , "friction": 0.8 },
-      { "id": "SHOULDER" , "x": 5    , "y": -5.5 , "friction": 0.8 },
-      { "id": "RHAND"    , "x": 11.5 , "y": -5   , "friction": 0.1 },
-      { "id": "LHAND"    , "x": 11.5 , "y": -5   , "friction": 0.1 },
-      { "id": "LFOOT"    , "x": 10   , "y": 5    , "friction": 0   },
-      { "id": "RFOOT"    , "x": 10   , "y": 5    , "friction": 0   }
-    ],
-    "noncollidable": [
-      { "id": "SCARF_0" , "x": 3  , "y": -5.5 , "airFriction": 0.2 },
-      { "id": "SCARF_1" , "x": 1  , "y": -5.5 , "airFriction": 0.2 },
-      { "id": "SCARF_2" , "x": -1 , "y": -5.5 , "airFriction": 0.2 },
-      { "id": "SCARF_3" , "x": -3 , "y": -5.5 , "airFriction": 0.2 },
-      { "id": "SCARF_4" , "x": -5 , "y": -5.5 , "airFriction": 0.2 },
-      { "id": "SCARF_5" , "x": -7 , "y": -5.5 , "airFriction": 0.2 },
-      { "id": "SCARF_6" , "x": -9 , "y": -5.5 , "airFriction": 0.2 }
-    ]
-  },
-  "constraints": {
-    "iterating": [
-      { "id": "PEG_TAIL"         , "p1": "PEG"      , "p2": "TAIL"   , "type": "STICK"       },
-      { "id": "TAIL_NOSE"        , "p1": "TAIL"     , "p2": "NOSE"   , "type": "STICK"       },
-      { "id": "NOSE_STRING"      , "p1": "NOSE"     , "p2": "STRING" , "type": "STICK"       },
-      { "id": "STRING_PEG"       , "p1": "STRING"   , "p2": "PEG"    , "type": "STICK"       },
-      { "id": "PEG_NOSE"         , "p1": "PEG"      , "p2": "NOSE"   , "type": "STICK"       },
-      { "id": "STRING_TAIL"      , "p1": "STRING"   , "p2": "TAIL"   , "type": "STICK"       },
-      { "id": "PEG_BUTT"         , "p1": "PEG"      , "p2": "BUTT"   , "type": "BIND_STICK"  },
-      { "id": "TAIL_BUTT"        , "p1": "TAIL"     , "p2": "BUTT"   , "type": "BIND_STICK"  },
-      { "id": "NOSE_BUTT"        , "p1": "NOSE"     , "p2": "BUTT"   , "type": "BIND_STICK"  },
-      { "id": "SHOULDER_BUTT"    , "p1": "SHOULDER" , "p2": "BUTT"   , "type": "STICK"       },
-      { "id": "SHOULDER_LHAND"   , "p1": "SHOULDER" , "p2": "LHAND"  , "type": "STICK"       },
-      { "id": "SHOULDER_RHAND"   , "p1": "SHOULDER" , "p2": "RHAND"  , "type": "STICK"       },
-      { "id": "BUTT_LFOOT"       , "p1": "BUTT"     , "p2": "LFOOT"  , "type": "STICK"       },
-      { "id": "BUTT_RFOOT"       , "p1": "BUTT"     , "p2": "RFOOT"  , "type": "STICK"       },
-      { "id": "SHOULDER_RHAND_2" , "p1": "SHOULDER" , "p2": "RHAND"  , "type": "STICK"       },
-      { "id": "SHOULDER_PEG"     , "p1": "SHOULDER" , "p2": "PEG"    , "type": "BIND_STICK"  },
-      { "id": "STRING_LHAND"     , "p1": "STRING"   , "p2": "LHAND"  , "type": "BIND_STICK"  },
-      { "id": "STRING_RHAND"     , "p1": "STRING"   , "p2": "RHAND"  , "type": "BIND_STICK"  },
-      { "id": "LFOOT_NOSE"       , "p1": "LFOOT"    , "p2": "NOSE"   , "type": "BIND_STICK"  },
-      { "id": "RFOOT_NOSE"       , "p1": "RFOOT"    , "p2": "NOSE"   , "type": "BIND_STICK"  },
-      { "id": "SHOULDER_LFOOT"   , "p1": "SHOULDER" , "p2": "LFOOT"  , "type": "REPEL_STICK" },
-      { "id": "SHOULDER_RFOOT"   , "p1": "SHOULDER" , "p2": "RFOOT"  , "type": "REPEL_STICK" }
-    ],
-    "noniterating": [
-      { "id": "SCARF_SEGMENT_0" , "p1": "SHOULDER" , "p2": "SCARF_0" , "type": "HALF_STICK" }
-      { "id": "SCARF_SEGMENT_1" , "p1": "SCARF_0"  , "p2": "SCARF_1" , "type": "HALF_STICK" }
-      { "id": "SCARF_SEGMENT_2" , "p1": "SCARF_1"  , "p2": "SCARF_2" , "type": "HALF_STICK" }
-      { "id": "SCARF_SEGMENT_3" , "p1": "SCARF_2"  , "p2": "SCARF_3" , "type": "HALF_STICK" }
-      { "id": "SCARF_SEGMENT_4" , "p1": "SCARF_3"  , "p2": "SCARF_4" , "type": "HALF_STICK" }
-      { "id": "SCARF_SEGMENT_5" , "p1": "SCARF_4"  , "p2": "SCARF_5" , "type": "HALF_STICK" }
-      { "id": "SCARF_SEGMENT_6" , "p1": "SCARF_5"  , "p2": "SCARF_6" , "type": "HALF_STICK" }
-    ]
-  },
-  "joints": [
-    { "id": "STRING_PEG_TAIL" , "c1": "PEG_TAIL"      , "c2": "STRING_PEG" },
-    { "id": "BODY_SLED"       , "c1": "SHOULDER_BUTT" , "c2": "STRING_PEG" }
+  "states": [
+    { "id": "RIDER_MOUNTED" , "type": "Binding" },
+    { "id": "SLED_INTACT"   , "type": "Binding" },
+    { "id": "PEG"           , "type": "CollisionPoint" , "x": 0    , "y": 0    , "friction": 0.8    },
+    { "id": "TAIL"          , "type": "CollisionPoint" , "x": 0    , "y": 5    , "friction": 0      },
+    { "id": "NOSE"          , "type": "CollisionPoint" , "x": 15   , "y": 5    , "friction": 0      },
+    { "id": "STRING"        , "type": "CollisionPoint" , "x": 17.5 , "y": 0    , "friction": 0      },
+    { "id": "BUTT"          , "type": "CollisionPoint" , "x": 5    , "y": 0    , "friction": 0.8    },
+    { "id": "SHOULDER"      , "type": "CollisionPoint" , "x": 5    , "y": -5.5 , "friction": 0.8    },
+    { "id": "RHAND"         , "type": "CollisionPoint" , "x": 11.5 , "y": -5   , "friction": 0.1    },
+    { "id": "LHAND"         , "type": "CollisionPoint" , "x": 11.5 , "y": -5   , "friction": 0.1    },
+    { "id": "LFOOT"         , "type": "CollisionPoint" , "x": 10   , "y": 5    , "friction": 0      },
+    { "id": "RFOOT"         , "type": "CollisionPoint" , "x": 10   , "y": 5    , "friction": 0      },
+    { "id": "SCARF_0"       , "type": "FlutterPoint"   , "x": 3    , "y": -5.5 , "airFriction": 0.2 },
+    { "id": "SCARF_1"       , "type": "FlutterPoint"   , "x": 1    , "y": -5.5 , "airFriction": 0.2 },
+    { "id": "SCARF_2"       , "type": "FlutterPoint"   , "x": -1   , "y": -5.5 , "airFriction": 0.2 },
+    { "id": "SCARF_3"       , "type": "FlutterPoint"   , "x": -3   , "y": -5.5 , "airFriction": 0.2 },
+    { "id": "SCARF_4"       , "type": "FlutterPoint"   , "x": -5   , "y": -5.5 , "airFriction": 0.2 },
+    { "id": "SCARF_5"       , "type": "FlutterPoint"   , "x": -7   , "y": -5.5 , "airFriction": 0.2 },
+    { "id": "SCARF_6"       , "type": "FlutterPoint"   , "x": -9   , "y": -5.5 , "airFriction": 0.2 }
+  ],
+  "constraints": [
+    { "id": "PEG_TAIL"         , "type": "Stick"         , "p1": "PEG"      , "p2": "TAIL"   },
+    { "id": "TAIL_NOSE"        , "type": "Stick"         , "p1": "TAIL"     , "p2": "NOSE"   },
+    { "id": "NOSE_STRING"      , "type": "Stick"         , "p1": "NOSE"     , "p2": "STRING" },
+    { "id": "STRING_PEG"       , "type": "Stick"         , "p1": "STRING"   , "p2": "PEG"    },
+    { "id": "PEG_NOSE"         , "type": "Stick"         , "p1": "PEG"      , "p2": "NOSE"   },
+    { "id": "STRING_TAIL"      , "type": "Stick"         , "p1": "STRING"   , "p2": "TAIL"   },
+    { "id": "PEG_BUTT"         , "type": "BindStick"     , "p1": "PEG"      , "p2": "BUTT"    , "binding": "RIDER_MOUNTED" , "endurance": 0.057 },
+    { "id": "TAIL_BUTT"        , "type": "BindStick"     , "p1": "TAIL"     , "p2": "BUTT"    , "binding": "RIDER_MOUNTED" , "endurance": 0.057 },
+    { "id": "NOSE_BUTT"        , "type": "BindStick"     , "p1": "NOSE"     , "p2": "BUTT"    , "binding": "RIDER_MOUNTED" , "endurance": 0.057 },
+    { "id": "SHOULDER_BUTT"    , "type": "Stick"         , "p1": "SHOULDER" , "p2": "BUTT"   },
+    { "id": "SHOULDER_LHAND"   , "type": "Stick"         , "p1": "SHOULDER" , "p2": "LHAND"  },
+    { "id": "SHOULDER_RHAND"   , "type": "Stick"         , "p1": "SHOULDER" , "p2": "RHAND"  },
+    { "id": "BUTT_LFOOT"       , "type": "Stick"         , "p1": "BUTT"     , "p2": "LFOOT"  },
+    { "id": "BUTT_RFOOT"       , "type": "Stick"         , "p1": "BUTT"     , "p2": "RFOOT"  },
+    { "id": "SHOULDER_RHAND_2" , "type": "Stick"         , "p1": "SHOULDER" , "p2": "RHAND"  },
+    { "id": "SHOULDER_PEG"     , "type": "BindStick"     , "p1": "SHOULDER" , "p2": "PEG"     , "binding": "RIDER_MOUNTED" , "endurance": 0.057 },
+    { "id": "STRING_LHAND"     , "type": "BindStick"     , "p1": "STRING"   , "p2": "LHAND"   , "binding": "RIDER_MOUNTED" , "endurance": 0.057 },
+    { "id": "STRING_RHAND"     , "type": "BindStick"     , "p1": "STRING"   , "p2": "RHAND"   , "binding": "RIDER_MOUNTED" , "endurance": 0.057 },
+    { "id": "LFOOT_NOSE"       , "type": "BindStick"     , "p1": "LFOOT"    , "p2": "NOSE"    , "binding": "RIDER_MOUNTED" , "endurance": 0.057 },
+    { "id": "RFOOT_NOSE"       , "type": "BindStick"     , "p1": "RFOOT"    , "p2": "NOSE"    , "binding": "RIDER_MOUNTED" , "endurance": 0.057 },
+    { "id": "SHOULDER_LFOOT"   , "type": "RepelStick"    , "p1": "SHOULDER" , "p2": "LFOOT"  },
+    { "id": "SHOULDER_RFOOT"   , "type": "RepelStick"    , "p1": "SHOULDER" , "p2": "RFOOT"  },
+    { "id": "BODY_SLED_JOINT"  , "type": "BindJoint"     , "p1": "SHOULDER" , "p2": "BUTT"    , "q1": "STRING" , "q2": "PEG" , "binding": "RIDER_MOUNTED"  },
+    { "id": "SLED_PEG_JOINT"   , "type": "BindJoint"     , "p1": "PEG"      , "p2": "TAIL"    , "q1": "STRING" , "q2": "PEG" , "binding": "SLED_INTACT"    },
+    { "id": "RIDER_PEG_JOINT"  , "type": "BindJoint"     , "p1": "PEG"      , "p2": "TAIL"    , "q1": "STRING" , "q2": "PEG" , "binding": "RIDER_MOUNTED"  },
+    { "id": "SCARF"            , "type": "DirectedChain" , "ps": ["SHOULDER", "SCARF_0", "SCARF_1", "SCARF_2", "SCARF_3", "SCARF_4", "SCARF_5", "SCARF_6"] }
   ]
 }
