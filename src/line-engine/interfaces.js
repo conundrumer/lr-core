@@ -51,6 +51,9 @@ export class Line extends Interface {
 }
 
 export class LineEngine extends Interface {
+  get iterations () { return Number }
+  get stepOptions () { return Object }
+
   makeGrid () {
     return Grid
   }

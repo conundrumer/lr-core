@@ -3,8 +3,8 @@ import * as States from './states'
 import * as Constraints from './constraints'
 import V2 from '../V2.js'
 
-function createConstraintFromJson (data) {
-  return new Constraints[data.type](data)
+function createConstraintFromJson (data, initialStateMap) {
+  return new Constraints[data.type](data, initialStateMap)
 }
 
 function createStateFromJson (data, init) {
@@ -19,7 +19,8 @@ export default class Rider {
   constructor (riderBody = classicRiderBody) {
     // TODO: validate riderBody
     this.body = riderBody
-    this.constraints = riderBody.constraints.map(createConstraintFromJson)
+    let initialStateMap = new Map(this.makeStateArray().map((state) => [state.id, state]))
+    this.constraints = riderBody.constraints.map((data) => createConstraintFromJson(data, initialStateMap))
     this.bodyPointIDs = riderBody.states.filter(({type}) => type === 'CollisionPoint').map(({id}) => id)
   }
   makeStateArray (position, velocity) {
