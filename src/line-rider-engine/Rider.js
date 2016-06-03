@@ -21,7 +21,6 @@ export default class Rider {
     this.body = riderBody
     let initialStateMap = new Map(this.makeStateArray().map((state) => [state.id, state]))
     this.constraints = riderBody.constraints.map((data) => createConstraintFromJson(data, initialStateMap))
-    this.bodyPointIDs = riderBody.states.filter(({type}) => type === 'CollisionPoint').map(({id}) => id)
   }
   makeStateArray (position, velocity) {
     return this.body.states.map((stateData) =>
@@ -29,10 +28,11 @@ export default class Rider {
     )
   }
   getBody (stateMap) {
-    let points = this.bodyPointIDs.map((id) => stateMap.get(id))
+    let points = this.body.parts.BODY.map((id) => stateMap.get(id))
     return {
       position: averageVectors(points.map(({pos}) => pos)),
-      velocity: averageVectors(points.map(({vel}) => vel))
+      velocity: averageVectors(points.map(({vel}) => vel)),
+      stateMap
     }
   }
 }

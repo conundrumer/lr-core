@@ -38,6 +38,9 @@ export class Point extends Immo {
       vel: vel
     })
   }
+  setPosition (pos) {
+    return this.updateState({pos})
+  }
 }
 setupImmo(Point)
 
@@ -62,16 +65,32 @@ export class Binding extends Immo {
     return {
       id: null,
       collidable: false,
-      steppable: false
+      steppable: true
     }
   }
   __state__ () {
     return {
-      binded: true
+      framesSinceUnbind: -1
     }
   }
   constructor ({id}) {
     super({props: {id}})
+  }
+  isBinded () {
+    return this.framesSinceUnbind === -1
+  }
+  setBind (bind) {
+    if (bind && !this.isBinded()) {
+      return this.updateState({framesSinceUnbind: -1})
+    } else if (!bind && this.isBinded()) {
+      return this.updateState({framesSinceUnbind: 0})
+    }
+  }
+  step () {
+    if (this.isBinded()) {
+      return this
+    }
+    return this.updateState({ framesSinceUnbind: this.framesSinceUnbind + 1 })
   }
 }
 setupImmo(Binding)

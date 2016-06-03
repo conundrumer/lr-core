@@ -100,7 +100,10 @@ for (let key in V2Functions) {
 }
 
 function V2 (v) {
-  return Object.assign(Object.create(V2Methods), v)
+  let u = Object.create(V2Methods)
+  u.x = v.x
+  u.y = v.y
+  return u
 }
 
 Object.assign(V2, V2Functions)

@@ -32,4 +32,101 @@ test('LineRiderEngine', (t) => {
 
     t.end()
   })
+
+  t.test('simulation with two lines', (t) => {
+    const Y = 5
+    const LINE1 = {id: 0, type: 0, x1: 0, y1: 5, x2: 30, y2: 5}
+    const LINE2 = {id: 1, type: 0, x1: -7, y1: 10, x2: -7, y2: 0}
+    const INDEX = 15
+
+    let engine = new LineRiderEngine()
+      .addLine(createLineFromJson(LINE1))
+      .addLine(createLineFromJson(LINE2))
+
+    let rider = engine.getRider(INDEX)
+    let shoulder = rider.stateMap.get('SHOULDER')
+    let butt = rider.stateMap.get('BUTT')
+    let nose = rider.stateMap.get('NOSE')
+
+    t.ok(
+      shoulder.pos.x > 0 && nose.pos.x < 0,
+      'rider should have been separated from sled'
+    )
+    t.ok(shoulder.pos.y < Y - 0.01, 'rider should not have been flattened')
+    t.ok(
+      butt.pos.y > Y - 0.01 && butt.pos.x > 0 && shoulder.pos.x > butt.pos.x,
+      'rider should be sitting and leaning forward'
+    )
+    // printSim(engine, INDEX)
+
+    t.end()
+  })
 })
+
+import Table from 'easy-table'
+function printSim (engine, length) {
+  let IDs = [...engine.rider.body.parts.SLED, ...engine.rider.body.parts.BODY]
+  let names = ['i', 'update type', 'id', 'onsled']
+
+  const getUpdateType = (type, id) => {
+    switch (type) {
+      case 'CollisionUpdate':
+        let line = engine.getLineByID(id)
+        return type.slice(0, 3) + ':' + line.constructor.name
+      case 'ConstraintUpdate':
+        let constraint = engine.constraints.get(id)
+        return type.slice(0, 3) + ':' + constraint.constructor.name
+      default:
+        return type
+    }
+  }
+  let data = Array(length).fill().map((_, i) =>
+    engine
+      .getUpdatesAtFrame(i)
+      // .filter(({type}) => type !== 'ConstraintUpdate')
+      .map(({type, id = '', updated}) => {
+        let isOnSled = ''
+        let updates = Array(IDs.length * 2).fill(null)
+        for (let update of updated) {
+          let {id, pos: {x, y} = {}} = update
+          let j = IDs.indexOf(id)
+          if (j >= 0) {
+            updates[2 * j] = x
+            updates[2 * j + 1] = y
+          }
+          if (id === 'RIDER_MOUNTED') {
+            isOnSled = update.isBinded()
+          }
+        }
+        return [i, getUpdateType(type, id), id, isOnSled, ...updates]
+      })
+  ).reduce((a, b, i) => {
+    let rider = engine.getRider(i)
+    let points = IDs.map((id) =>
+      rider.stateMap.get(id).pos
+    ).map(({x, y}) => [x, y])
+    .reduce((a, b) => [...a, ...b])
+    return [...a, ...b, [i, 'FrameEnd', '', rider.stateMap.get('RIDER_MOUNTED').isBinded(), ...points]]
+  }, [])
+
+  let t = new Table()
+  t.separator = '│'
+
+  for (let row of data) {
+    row.forEach((cell, i) => {
+      let name
+      if (i < 4) {
+        name = names[i]
+      } else {
+        i -= 4
+        name = IDs[Math.floor(i / 2)].slice(0, 4)
+        name += i % 2 === 0 ? 'x' : 'y'
+        i += 4
+      }
+      t.cell(name, cell, i > 3 ? Table.number(2) : null)
+    })
+    t.newRow()
+  }
+
+  t.log()
+}
