@@ -77,6 +77,23 @@ test('LineRiderEngine', (t) => {
 
     t.end()
   })
+
+  t.test('simulation with acc line', (t) => {
+    const LINE = {id: 0, type: LineTypes.SOLID, x1: 0, y1: 5, x2: 30, y2: 5}
+    const ACC_LINE = {id: 0, type: LineTypes.ACC, x1: 0, y1: 5, x2: 30, y2: 5}
+    const INDEX = 11
+
+    let engine = new LineRiderEngine()
+
+    let engineWithLine = engine.addLine(createLineFromJson(LINE))
+    let engineWithAccLine = engine.addLine(createLineFromJson(ACC_LINE))
+
+    let riderMoving = engineWithLine.getRider(INDEX).position
+    let riderMovingFaster = engineWithAccLine.getRider(INDEX).position
+
+    t.ok(riderMoving.x < riderMovingFaster.x, 'rider should have accelerated')
+    t.end()
+  })
 })
 
 import Table from 'easy-table'

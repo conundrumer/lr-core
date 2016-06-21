@@ -40,7 +40,7 @@ export default class SolidLine extends Line {
       }
       v.add(p.prevPos)
 
-      return p.updateState({pos, prevPos: v})
+      return this.doCollide(p, pos, v)
     }
     return null
   }
@@ -92,5 +92,9 @@ export default class SolidLine extends Line {
       linePos >= this.c.leftBound && linePos <= this.c.rightBound
 
     return pointMovingIntoLine && pointInForceBounds
+  }
+
+  doCollide (p, pos, prevPos) {
+    return p.updateState({pos, prevPos})
   }
 }

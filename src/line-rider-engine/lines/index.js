@@ -1,5 +1,6 @@
 import LineTypes from './LineTypes.js'
 import SolidLine from './SolidLine.js'
+import AccLine from './AccLine.js'
 import SceneryLine from './SceneryLine.js'
 
 export {default as LineTypes} from './LineTypes.js'
@@ -10,8 +11,7 @@ export function createLineFromJson (data) {
     case LineTypes.SOLID:
       return new SolidLine(data)
     case LineTypes.ACC:
-      throw new Error('not implemented')
-      // return new Line(data)
+      return new AccLine(data)
     case LineTypes.SCENERY:
       return new SceneryLine(data)
     default:
