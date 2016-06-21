@@ -33,10 +33,10 @@ test('LineRiderEngine', (t) => {
     t.end()
   })
 
-  t.test('simulation with two lines', (t) => {
+  t.test('simulation with two lines, one flipped', (t) => {
     const Y = 5
     const LINE1 = {id: 0, type: LineTypes.SOLID, x1: 0, y1: 5, x2: 30, y2: 5}
-    const LINE2 = {id: 1, type: LineTypes.SOLID, x1: -7, y1: 10, x2: -7, y2: 0}
+    const LINE2 = {id: 1, type: LineTypes.SOLID, x1: -7, y1: 0, x2: -7, y2: 10, flipped: true}
     const INDEX = 15
 
     let engine = new LineRiderEngine()
@@ -92,6 +92,23 @@ test('LineRiderEngine', (t) => {
     let riderMovingFaster = engineWithAccLine.getRider(INDEX).position
 
     t.ok(riderMoving.x < riderMovingFaster.x, 'rider should have accelerated')
+    t.end()
+  })
+
+  t.test('simulation with reversed acc line', (t) => {
+    const LINE = {id: 0, type: LineTypes.SOLID, x1: 0, y1: 5, x2: 30, y2: 5}
+    const ACC_LINE = {id: 0, type: LineTypes.ACC, x1: 30, y1: 5, x2: 0, y2: 5, flipped: true}
+    const INDEX = 11
+
+    let engine = new LineRiderEngine()
+
+    let engineWithLine = engine.addLine(createLineFromJson(LINE))
+    let engineWithAccLine = engine.addLine(createLineFromJson(ACC_LINE))
+
+    let riderMoving = engineWithLine.getRider(INDEX).position
+    let riderMovingBackwards = engineWithAccLine.getRider(INDEX).position
+
+    t.ok(riderMoving.x > riderMovingBackwards.x, 'rider should have moved backwards')
     t.end()
   })
 })

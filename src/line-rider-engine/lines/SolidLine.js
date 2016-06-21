@@ -9,9 +9,9 @@ const MIN_EXTENSION_RATIO = 0.25
 export default class SolidLine extends Line {
   constructor (data) {
     super(data)
-    this.flipped = false
-    this.leftExtended = false
-    this.rightExtended = false
+    this.flipped = data.flipped || false
+    this.leftExtended = data.leftExtended || false
+    this.rightExtended = data.rightExtended || false
     this.c = this.getComputed()
   }
 
