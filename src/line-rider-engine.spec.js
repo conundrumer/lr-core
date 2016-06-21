@@ -1,6 +1,6 @@
 import test from 'tape'
 
-import LineRiderEngine, {createLineFromJson} from './line-rider-engine'
+import LineRiderEngine, {createLineFromJson, LineTypes} from './line-rider-engine'
 
 test('LineRiderEngine', (t) => {
   t.test('simulation with no lines', (t) => {
@@ -17,7 +17,7 @@ test('LineRiderEngine', (t) => {
 
   t.test('simulation with one line', (t) => {
     const Y = 5
-    const LINE = {id: 0, type: 0, x1: 0, y1: 5, x2: 30, y2: 5}
+    const LINE = {id: 0, type: LineTypes.SOLID, x1: 0, y1: 5, x2: 30, y2: 5}
     const INDEX = 11
 
     let engine = new LineRiderEngine()
@@ -35,8 +35,8 @@ test('LineRiderEngine', (t) => {
 
   t.test('simulation with two lines', (t) => {
     const Y = 5
-    const LINE1 = {id: 0, type: 0, x1: 0, y1: 5, x2: 30, y2: 5}
-    const LINE2 = {id: 1, type: 0, x1: -7, y1: 10, x2: -7, y2: 0}
+    const LINE1 = {id: 0, type: LineTypes.SOLID, x1: 0, y1: 5, x2: 30, y2: 5}
+    const LINE2 = {id: 1, type: LineTypes.SOLID, x1: -7, y1: 10, x2: -7, y2: 0}
     const INDEX = 15
 
     let engine = new LineRiderEngine()

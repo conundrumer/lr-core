@@ -1,5 +1,5 @@
 export {default} from './LineRiderEngine.js'
-export {createLineFromJson} from './lines'
+export {createLineFromJson, LineTypes} from './lines'
 
 /*
 export class CustomLineRiderEngine {
