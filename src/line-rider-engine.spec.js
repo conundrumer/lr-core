@@ -61,6 +61,22 @@ test('LineRiderEngine', (t) => {
 
     t.end()
   })
+
+  t.test('simulation with scenery line', (t) => {
+    const LINE = {id: 0, type: LineTypes.SCENERY, x1: 0, y1: 5, x2: 30, y2: 5}
+    const INDEX = 11
+
+    let engine = new LineRiderEngine()
+
+    let engineWithLine = engine.addLine(createLineFromJson(LINE))
+
+    let riderFalling = engine.getRider(INDEX).position
+    let riderColliding = engineWithLine.getRider(INDEX).position
+
+    t.ok(riderColliding.y === riderFalling.y, 'rider should not have collided with line')
+
+    t.end()
+  })
 })
 
 import Table from 'easy-table'

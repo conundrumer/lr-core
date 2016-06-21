@@ -1,5 +1,6 @@
 import LineTypes from './LineTypes.js'
 import SolidLine from './SolidLine.js'
+import SceneryLine from './SceneryLine.js'
 
 export {default as LineTypes} from './LineTypes.js'
 export function createLineFromJson (data) {
@@ -12,8 +13,7 @@ export function createLineFromJson (data) {
       throw new Error('not implemented')
       // return new Line(data)
     case LineTypes.SCENERY:
-      throw new Error('not implemented')
-      // return new Line(data)
+      return new SceneryLine(data)
     default:
       console.warn(`Line JSON has unknown type, creating as scenery line: ${data.toString()}`)
       // return new Line(data)

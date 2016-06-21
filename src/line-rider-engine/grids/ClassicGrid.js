@@ -7,17 +7,18 @@
 
 export default class NoGrid {
   constructor () {
-    this.lines = new Set()
+    this.collidableLines = new Set()
   }
   add (line) {
-    this.lines.add(line)
+    if (!line.collidable) return []
+    this.collidableLines.add(line)
     return [0]
   }
   remove (line) {
-    this.lines.delete(line)
+    this.collidableLines.delete(line)
   }
   getLinesNearEntity (entity) {
-    return Array.from(this.lines)
+    return Array.from(this.collidableLines)
   }
   getCellsNearEntity (entity) {
     return [0]
