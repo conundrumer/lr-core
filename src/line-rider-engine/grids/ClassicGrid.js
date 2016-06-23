@@ -1,17 +1,18 @@
-import sortedIndex from 'lodash/sortedIndex.js'
+import sortedIndexBy from 'lodash/sortedIndexBy.js'
 
-import {ddaCells as getCellsFromLine} from './getCellsFromLine.js'
+import {classicCells as getCellsFromLine} from './getCellsFromLine.js'
 import {hashIntPair} from '../../hashNumberPair.js'
 
 const GRID_SIZE = 14
 
+// lines should be sorted descending
 class OrderedLinesArray extends Array {
   constructor () {
     super()
     this._set = new Set()
   }
   getIndexOf (line) {
-    return sortedIndex(this, line, l => -l.id)
+    return sortedIndexBy(this, line, l => -l.id)
   }
   has (line) {
     return this._set.has(line.id)

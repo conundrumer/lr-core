@@ -51,7 +51,7 @@
   "parts": {
     "SCARF":     [ "SHOULDER" , "SCARF_0"   , "SCARF_1", "SCARF_2", "SCARF_3", "SCARF_4", "SCARF_5", "SCARF_6"],
     "BODY":      [ "BUTT"     , "SHOULDER"  , "RHAND", "LHAND", "LFOOT", "RFOOT"],
-    "SLED":      [ "PEG"      , "STRING"    , "NOSE", "TAIL"],
+    "SLED":      [ "PEG"      , "TAIL"      , "NOSE", "STRING"],
     "LEFT_ARM":  [ "SHOULDER" , "LHAND"    ],
     "RIGHT_ARM": [ "SHOULDER" , "RHAND"    ],
     "LEFT_LEG":  [ "BUTT"     , "LFOOT"    ],

@@ -114,25 +114,36 @@ test('LineRiderEngine', (t) => {
 })
 
 test('LineRiderEngine Compatibility', (t) => {
-  const runTestTrack = (trackPath, legacy = false) => (t) => {
+  const runTestTrack = (trackPath, legacy, extraTest = () => {}) => (t) => {
     let track = require(trackPath)
     let engine = new LineRiderEngine()
       .setStart(track.startPosition)
       .addLine(track.lines.map(createLineFromJson))
+    extraTest(t, engine)
 
     let riderCrashed = engine
       .getRider(track.duration)
       .stateMap.get('RIDER_MOUNTED')
       .framesSinceUnbind
-
-    t.equal(track.duration - riderCrashed, track.duration, 'rider should not have crashed')
+    t.equal(track.duration - riderCrashed, 1 + track.duration, 'rider should not have crashed')
     t.end()
   }
 
-  t.comment('Crashing at frame 63: line extensions have not been implemented')
-  t.comment('Crashing at frame 86: no grid is being used')
-  t.comment('Crashing at frame 433: grid is incorrect')
-  t.test('test track', runTestTrack('../fixtures/testTrack.track.json'))
+  t.test('test track', runTestTrack('../fixtures/testTrack.track.json', false, (t, engine) => {
+    t.skip('extra tests for test track', t => {
+      t.comment('Crashing at frame 63: line extensions have not been implemented')
+      t.comment('Crashing at frame 86: no grid is being used')
+      t.comment('Crashing at frame 433: order of lines is backwards')
+      t.equal(engine.getRider(416).stateMap.get('TAIL').pos.x, 804.1054060579701, 'frame 416 tail should be consistent')
+      t.equal(engine.getRider(416).stateMap.get('NOSE').pos.x, 813.3255772705486, 'frame 416 nose should be consistent')
+      t.equal(engine.getRider(417).stateMap.get('TAIL').pos.x, 797.8845320873339, 'frame 417 tail should be consistent')
+      t.equal(engine.getRider(417).stateMap.get('NOSE').pos.x, 810.0876743591476, 'frame 417 nose should be consistent')
+      // printSim(engine, 2, 416)
+      t.end()
+    })
+  }))
+
+  t.test('cycloid', runTestTrack('../fixtures/cycloid.track.json', false))
 
   t.skip('legacy test track', runTestTrack('../fixtures/legacyTestTrack.track.json', true))
 
@@ -140,7 +151,7 @@ test('LineRiderEngine Compatibility', (t) => {
 })
 
 import Table from 'easy-table'
-function printSim (engine, length) {
+function printSim (engine, length, start = 0) {
   let IDs = [...engine.rider.body.parts.SLED, ...engine.rider.body.parts.BODY]
   let names = ['i', 'update type', 'id', 'onsled']
 
@@ -156,7 +167,7 @@ function printSim (engine, length) {
         return type
     }
   }
-  let data = Array(length).fill().map((_, i) =>
+  let data = Array(length).fill().map((_, i) => i + start).map((i) =>
     engine
       .getUpdatesAtFrame(i)
       // .filter(({type}) => type !== 'ConstraintUpdate')
@@ -177,6 +188,7 @@ function printSim (engine, length) {
         return [i, getUpdateType(type, id), id, isOnSled, ...updates]
       })
   ).reduce((a, b, i) => {
+    i += start
     let rider = engine.getRider(i)
     let points = IDs.map((id) =>
       rider.stateMap.get(id).pos
