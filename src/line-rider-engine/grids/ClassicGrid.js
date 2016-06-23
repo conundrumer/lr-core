@@ -1,13 +1,9 @@
 import sortedIndex from 'lodash/sortedIndex.js'
 
-import dda from '../../dda.js'
+import {ddaCells as getCellsFromLine} from './getCellsFromLine.js'
 import {hashIntPair} from '../../hashNumberPair.js'
 
 const GRID_SIZE = 14
-
-function toGrid (x) {
-  return Math.floor(x / GRID_SIZE)
-}
 
 class OrderedLinesArray extends Array {
   constructor () {
@@ -80,7 +76,7 @@ export default class ClassicGrid {
 
   add (line) {
     if (!line.collidable) return []
-    let cells = this.getCellsFromLine(line)
+    let cells = getCellsFromLine(line, GRID_SIZE)
     this.lineCellsMap.add(line, cells)
     this.cellLinesMap.add(line, cells)
     return cells
@@ -92,8 +88,8 @@ export default class ClassicGrid {
 
   // 3x3 grid around entity
   getCellsNearEntity (entity) {
-    let gx = toGrid(entity.pos.x)
-    let gy = toGrid(entity.pos.y)
+    let gx = Math.floor(entity.pos.x / GRID_SIZE)
+    let gy = Math.floor(entity.pos.y / GRID_SIZE)
     let cells = []
     for (let i = -1; i <= 1; i++) {
       for (let j = -1; j <= 1; j++) {
@@ -115,10 +111,5 @@ export default class ClassicGrid {
       }
     }
     return lines
-  }
-
-  getCellsFromLine ({p1, p2}) {
-    return dda(p1.x / GRID_SIZE, p1.y / GRID_SIZE, p2.x / GRID_SIZE, p2.y / GRID_SIZE)
-      .map(({x, y}) => hashIntPair(x, y))
   }
 }
