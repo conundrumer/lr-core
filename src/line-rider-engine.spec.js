@@ -113,6 +113,32 @@ test('LineRiderEngine', (t) => {
   })
 })
 
+test('LineRiderEngine Compatibility', (t) => {
+  const runTestTrack = (trackPath, legacy = false) => (t) => {
+    let track = require(trackPath)
+    let engine = new LineRiderEngine()
+      .setStart(track.startPosition)
+      .addLine(track.lines.map(createLineFromJson))
+
+    let riderCrashed = engine
+      .getRider(track.duration)
+      .stateMap.get('RIDER_MOUNTED')
+      .framesSinceUnbind
+
+    t.equal(track.duration - riderCrashed, track.duration, 'rider should not have crashed')
+    t.end()
+  }
+
+  t.comment('Crashing at frame 63: line extensions have not been implemented')
+  t.comment('Crashing at frame 86: no grid is being used')
+  t.comment('Crashing at frame 433: grid is incorrect')
+  t.test('test track', runTestTrack('../fixtures/testTrack.track.json'))
+
+  t.skip('legacy test track', runTestTrack('../fixtures/legacyTestTrack.track.json', true))
+
+  t.end()
+})
+
 import Table from 'easy-table'
 function printSim (engine, length) {
   let IDs = [...engine.rider.body.parts.SLED, ...engine.rider.body.parts.BODY]
