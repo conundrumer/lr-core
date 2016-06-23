@@ -1,6 +1,6 @@
 import test from 'tape'
 
-import LineRiderEngine, {createLineFromJson, LineTypes} from './line-rider-engine'
+import LineRiderEngine, {createLineFromJson, LineTypes, CustomLineRiderEngine} from './line-rider-engine'
 
 test('LineRiderEngine', (t) => {
   t.test('simulation with no lines', (t) => {
@@ -116,7 +116,7 @@ test('LineRiderEngine', (t) => {
 test('LineRiderEngine Compatibility', (t) => {
   const runTestTrack = (trackPath, legacy, extraTest = () => {}) => (t) => {
     let track = require(trackPath)
-    let engine = new LineRiderEngine()
+    let engine = (legacy ? new CustomLineRiderEngine({legacy: true}) : new LineRiderEngine())
       .setStart(track.startPosition)
       .addLine(track.lines.map(createLineFromJson))
     extraTest(t, engine)
@@ -143,9 +143,19 @@ test('LineRiderEngine Compatibility', (t) => {
     })
   }))
 
-  t.test('cycloid', runTestTrack('../fixtures/cycloid.track.json', false))
+  t.test('cycloid', runTestTrack('../fixtures/cycloid.track.json', false, (t) => {
+    t.skip('extra tests for cycloid', t => {
+      t.comment('Crashing at frame 146: using dda instead of classic cells')
+      t.end()
+    })
+  }))
 
-  t.skip('legacy test track', runTestTrack('../fixtures/legacyTestTrack.track.json', true))
+  t.test('legacy test track', runTestTrack('../fixtures/legacyTestTrack.track.json', true, (t) => {
+    t.skip('extra tests for legacy test track', t => {
+      t.comment('Crashing at frame 862: not using legacy cells')
+      t.end()
+    })
+  }))
 
   t.end()
 })

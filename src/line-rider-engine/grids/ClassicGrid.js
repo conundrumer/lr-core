@@ -70,14 +70,15 @@ class CellLinesMap extends Map {
 // handles collidable lines in 6.2 physics
 export default class ClassicGrid {
 
-  constructor () {
+  constructor (getCellFn = getCellsFromLine) {
+    this.getCellsFromLine = getCellFn
     this.lineCellsMap = new LineCellsMap()
     this.cellLinesMap = new CellLinesMap()
   }
 
   add (line) {
     if (!line.collidable) return []
-    let cells = getCellsFromLine(line, GRID_SIZE)
+    let cells = this.getCellsFromLine(line, GRID_SIZE)
     this.lineCellsMap.add(line, cells)
     this.cellLinesMap.add(line, cells)
     return cells

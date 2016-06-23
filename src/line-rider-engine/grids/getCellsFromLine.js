@@ -14,7 +14,7 @@ export function classicCells (line, gridSize) {
 
 // 6.1
 export function legacyCells (line, gridSize) {
-  return
+  return LegacyCells.getCellsPos(line, gridSize).map(({x, y}) => hashIntPair(x, y))
 }
 
 class ClassicCells {
@@ -93,6 +93,38 @@ class ClassicCells {
     }
     return { x: dx, y: dy }
   }
+}
+
+class LegacyCells extends ClassicCells {
+  static getDelta (line, cellPos, gridSize) {
+    return {
+      x: -cellPos.gx + (line.c.vec.x > 0 ? gridSize : -1),
+      y: -cellPos.gy + (line.c.vec.y > 0 ? gridSize : -1)
+    }
+  }
+
+  static getNextPos (line, x, y, dx, dy) {
+    let slope = line.c.vec.y / line.c.vec.x
+    let yIsThisBelowActualY0 = line.p1.y - slope * line.p1.x
+    let yDoesThisEvenWork = Math.round(slope * (x + dx) + yIsThisBelowActualY0)
+    if (Math.abs(yDoesThisEvenWork - y) < Math.abs(dy)) {
+      return {
+        x: x + dx,
+        y: yDoesThisEvenWork
+      }
+    }
+    if (Math.abs(yDoesThisEvenWork - y) === Math.abs(dy)) {
+      return {
+        x: x + dx,
+        y: y + dy
+      }
+    }
+    return {
+      x: Math.round((y + dy - yIsThisBelowActualY0) / slope),
+      y: y + dy
+    }
+  }
+
 }
 
 function getCellPosAndOffset (px, py, gridSize) {

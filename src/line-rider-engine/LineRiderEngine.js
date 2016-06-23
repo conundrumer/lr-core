@@ -53,8 +53,8 @@ export default class LineRiderEngine extends LineEngine {
     return new Rider()
   }
 
-  makeGrid () {
-    return new ClassicGrid()
+  makeGrid (...args) {
+    return new ClassicGrid(...args)
   }
 
   /* not implemented rn */
