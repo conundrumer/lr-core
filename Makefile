@@ -5,8 +5,8 @@ SRC = src
 BUILD = build
 TEST = test-results
 
-BUILD_CMD = ./node_modules/.bin/babel --plugins transform-es2015-modules-commonjs
-TEST_CMD := node `node --v8-options | grep harm | awk '{print $$1}' | xargs`
+BUILD_CMD = ./node_modules/.bin/babel --presets es2015-node
+TEST_CMD := node
 
 SRC_FILES := $(call rwildcard,$(SRC)/,*.js) $(call rwildcard,$(SRC)/,*.json)
 BUILD_FILES := $(patsubst $(SRC)/%, $(BUILD)/%, $(SRC_FILES))

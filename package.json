@@ -11,7 +11,7 @@
   "license": "ISC",
   "devDependencies": {
     "babel-cli": "^6.9.0",
-    "babel-plugin-transform-es2015-modules-commonjs": "^6.8.0",
+    "babel-preset-es2015-node": "^6.1.0",
     "easy-table": "^1.0.0",
     "standard": "^7.1.1",
     "tape": "^4.5.1"
