@@ -169,10 +169,12 @@ test('SimpleEngine', (t) => {
   t.test('line editing', (t) => {
     let engine = new SimpleEngine()
 
+    t.equal(engine.getMaxLineID(), null, 'Max line ID with no lines is null')
+
     t.test('adding a line', (t) => {
       engine = engine.addLine(lines[0])
       t.equal(engine.getLineByID(0), lines[0])
-
+      t.equal(engine.getMaxLineID(), 0)
       t.end()
     })
 
@@ -183,6 +185,7 @@ test('SimpleEngine', (t) => {
       lines.forEach((line) => {
         t.equal(engine.getLineByID(line.id), line)
       })
+      t.equal(engine.getMaxLineID(), lines.length - 1)
 
       t.end()
     })
@@ -191,6 +194,7 @@ test('SimpleEngine', (t) => {
       engine = engine.removeLine(lines[0])
 
       t.equal(engine.getLineByID(0), undefined)
+      t.equal(engine.getMaxLineID(), lines.length - 1)
 
       t.end()
     })
@@ -202,6 +206,7 @@ test('SimpleEngine', (t) => {
       lines.forEach((line) => {
         t.equal(engine.getLineByID(line.id), undefined)
       })
+      t.equal(engine.getMaxLineID(), null)
 
       t.end()
     })

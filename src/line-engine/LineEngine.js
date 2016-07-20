@@ -85,6 +85,15 @@ export default class LineEngine extends Immo {
     return this.linesMap.get(id)
   }
 
+  getMaxLineID () {
+    this.updateComputed()
+    let length = this.linesList.size()
+    if (length === 0) {
+      return null
+    }
+    return this.linesList.get(length - 1).id
+  }
+
   addLine (line) {
     this.updateComputed()
     let nextLinesList = this._modifyLinesList(line, (lines, line) => {
