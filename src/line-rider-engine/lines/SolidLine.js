@@ -97,4 +97,9 @@ export default class SolidLine extends Line {
   doCollide (p, pos, prevPos) {
     return p.updateState({pos, prevPos})
   }
+
+  toJSON () {
+    let {flipped, leftExtended, rightExtended} = this
+    return Object.assign(super.toJSON(), {flipped, leftExtended, rightExtended})
+  }
 }

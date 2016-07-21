@@ -29,4 +29,15 @@ export default class Line {
   get norm () {
     return V2(this.vec).rotCW().mul(this.invLength * (this.flipped ? -1 : 1))
   }
+
+  toJSON () {
+    return {
+      id: this.id,
+      type: this.type,
+      x1: this.p1.x,
+      y1: this.p1.y,
+      x2: this.p2.x,
+      y2: this.p2.y
+    }
+  }
 }

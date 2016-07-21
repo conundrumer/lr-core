@@ -49,6 +49,15 @@ export default class LineRiderEngine extends LineEngine {
     return this.rider.getBody(this.getStateMapAtFrame(frameIndex))
   }
 
+  toJSON () {
+    // until List.toJS() gets implemented
+    this.linesList.__getBuffer()
+    return {
+      start: this.start,
+      lines: this.linesList.buffer.map(line => line.toJSON())
+    }
+  }
+
   /* private */
   makeRider () {
     return new Rider()
@@ -62,7 +71,6 @@ export default class LineRiderEngine extends LineEngine {
   // selectLinesInBox ([x0, y0, x1, y1])
   // selectLinesInRadius ({x, y}, r)
   // selectClosestLineInRadius ({x, y}, r)
-  // getLineData ()
   // getBoundingBox ()
 }
 setupImmo(LineRiderEngine)

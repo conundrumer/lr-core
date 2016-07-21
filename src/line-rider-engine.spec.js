@@ -1,6 +1,12 @@
 import test from 'tape'
 
 import LineRiderEngine, {createLineFromJson, LineTypes, CustomLineRiderEngine} from './line-rider-engine'
+import {DEFAULT_START_POSITION, DEFAULT_START_VELOCITY} from './line-rider-engine/constants.js'
+
+const DEFAULT_START = {
+  position: DEFAULT_START_POSITION,
+  velocity: DEFAULT_START_VELOCITY
+}
 
 test('LineRiderEngine', (t) => {
   t.test('simulation with no lines', (t) => {
@@ -111,6 +117,26 @@ test('LineRiderEngine', (t) => {
     t.ok(riderMoving.x > riderMovingBackwards.x, 'rider should have moved backwards')
     t.end()
   })
+
+  t.test('.toJSON()', t => {
+    const lines = [
+      {id: 0, type: LineTypes.SCENERY, x1: 0, y1: 5, x2: 30, y2: 5},
+      {id: 1, type: LineTypes.SOLID, x1: 0, y1: 5, x2: 30, y2: 5, flipped: false, leftExtended: false, rightExtended: false},
+      {id: 2, type: LineTypes.ACC, x1: 30, y1: 5, x2: 0, y2: 5, flipped: true, leftExtended: true, rightExtended: true}
+    ]
+
+    let engine = new LineRiderEngine()
+      .addLine(lines.map(createLineFromJson))
+
+    t.deepEqual(engine.toJSON(), {
+      start: DEFAULT_START,
+      lines: lines
+    }, 'correct json')
+
+    t.end()
+  })
+
+  t.end()
 })
 
 test('LineRiderEngine Compatibility', (t) => {
