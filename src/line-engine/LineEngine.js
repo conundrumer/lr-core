@@ -80,7 +80,7 @@ export default class LineEngine extends Immo {
     return this.frames[index].updates
   }
 
-  getLineByID (id) {
+  getLine (id) {
     this.updateComputed()
     return this.linesMap.get(id)
   }

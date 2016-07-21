@@ -75,7 +75,7 @@ export class LineEngine extends Interface {
     return ArrayOf(Object) // Update
   }
 
-  getLineByID (id = Number) {
+  getLine (id = Number) {
     return Line
   }
 

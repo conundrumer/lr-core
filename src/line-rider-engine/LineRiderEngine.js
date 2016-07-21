@@ -27,7 +27,8 @@ export default class LineRiderEngine extends LineEngine {
 
   /* public */
   // getLastFrameIndex ()
-  // getLineByID (id)
+  // getLine (id)
+  // getMaxLineID ()
   // addLine (line)
   // removeLine (line)
   constructor () {
@@ -58,9 +59,9 @@ export default class LineRiderEngine extends LineEngine {
   }
 
   /* not implemented rn */
-  // getLinesInBox ([x0, y0, x1, y1])
-  // getLinesInRadius ({x, y}, r)
-  // getMaxLineID ()
+  // selectLinesInBox ([x0, y0, x1, y1])
+  // selectLinesInRadius ({x, y}, r)
+  // selectClosestLineInRadius ({x, y}, r)
   // getLineData ()
   // getBoundingBox ()
 }

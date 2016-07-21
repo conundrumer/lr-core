@@ -168,7 +168,7 @@ function printSim (engine, length, start = 0) {
   const getUpdateType = (type, id) => {
     switch (type) {
       case 'CollisionUpdate':
-        let line = engine.getLineByID(id)
+        let line = engine.getLine(id)
         return type.slice(0, 3) + ':' + line.constructor.name
       case 'ConstraintUpdate':
         let constraint = engine.constraints.get(id)

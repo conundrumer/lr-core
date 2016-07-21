@@ -173,7 +173,7 @@ test('SimpleEngine', (t) => {
 
     t.test('adding a line', (t) => {
       engine = engine.addLine(lines[0])
-      t.equal(engine.getLineByID(0), lines[0])
+      t.equal(engine.getLine(0), lines[0])
       t.equal(engine.getMaxLineID(), 0)
       t.end()
     })
@@ -183,7 +183,7 @@ test('SimpleEngine', (t) => {
       engine = engine.addLine(linesToAdd)
 
       lines.forEach((line) => {
-        t.equal(engine.getLineByID(line.id), line)
+        t.equal(engine.getLine(line.id), line)
       })
       t.equal(engine.getMaxLineID(), lines.length - 1)
 
@@ -193,7 +193,7 @@ test('SimpleEngine', (t) => {
     t.test('removing a line', (t) => {
       engine = engine.removeLine(lines[0])
 
-      t.equal(engine.getLineByID(0), undefined)
+      t.equal(engine.getLine(0), undefined)
       t.equal(engine.getMaxLineID(), lines.length - 1)
 
       t.end()
@@ -204,7 +204,7 @@ test('SimpleEngine', (t) => {
       engine = engine.removeLine(linesToRemove)
 
       lines.forEach((line) => {
-        t.equal(engine.getLineByID(line.id), undefined)
+        t.equal(engine.getLine(line.id), undefined)
       })
       t.equal(engine.getMaxLineID(), null)
 
@@ -227,31 +227,31 @@ test('SimpleEngine', (t) => {
     let engine5 = engine2.removeLine(lines[1])
 
     t.test('adding a line', (t) => {
-      t.equal(engine1.getLineByID(0), lines[0])
+      t.equal(engine1.getLine(0), lines[0])
       t.end()
     })
 
     t.test('removing a line', (t) => {
-      t.equal(engine3.getLineByID(0), undefined)
+      t.equal(engine3.getLine(0), undefined)
       t.end()
     })
 
     t.test('adding lines', (t) => {
       lines.forEach((line) => {
-        t.equal(engine2.getLineByID(line.id), line)
+        t.equal(engine2.getLine(line.id), line)
       })
       t.end()
     })
 
     t.test('removing lines', (t) => {
       lines.forEach((line) => {
-        t.equal(engine4.getLineByID(line.id), undefined)
+        t.equal(engine4.getLine(line.id), undefined)
       })
       t.end()
     })
 
     t.test('removing a line from a previous version', (t) => {
-      t.equal(engine5.getLineByID(1), undefined)
+      t.equal(engine5.getLine(1), undefined)
       t.end()
     })
 
