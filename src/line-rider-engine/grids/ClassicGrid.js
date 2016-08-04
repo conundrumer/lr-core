@@ -1,37 +1,8 @@
-import sortedIndexBy from 'lodash/sortedIndexBy.js'
-
 import {classicCells as getCellsFromLine} from './getCellsFromLine.js'
 import {hashIntPair} from '../../hashNumberPair.js'
+import OrderedObjectArray from '../../ordered-object-array.js'
 
 const GRID_SIZE = 14
-
-// lines should be sorted descending
-class OrderedLinesArray extends Array {
-  constructor () {
-    super()
-    this._set = new Set()
-  }
-  getIndexOf (line) {
-    return sortedIndexBy(this, line, l => -l.id)
-  }
-  has (line) {
-    return this._set.has(line.id)
-  }
-  add (line) {
-    if (!this.has(line)) {
-      this._set.add(line.id)
-      let index = this.getIndexOf(line)
-      this.splice(index, 0, line)
-    }
-  }
-  remove (line) {
-    if (this.has(line)) {
-      this._set.delete(line.id)
-      let index = this.getIndexOf(line)
-      this.splice(index, 1)
-    }
-  }
-}
 
 class LineCellsMap extends Map {
   add (line, cells) {
@@ -50,7 +21,7 @@ class CellLinesMap extends Map {
     for (let cell of cells) {
       let cellLines = this.get(cell)
       if (!cellLines) {
-        cellLines = new OrderedLinesArray()
+        cellLines = new OrderedObjectArray('id', true)
         this.set(cell, cellLines)
       }
       cellLines.add(line)
