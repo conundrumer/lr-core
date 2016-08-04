@@ -120,11 +120,11 @@ test('LineRiderEngine', (t) => {
     t.end()
   })
 
-  t.test('.toJSON()', t => {
+  t.test('.toJSON() and bounding box', t => {
     const lines = [
       {id: 0, type: LineTypes.SCENERY, x1: 0, y1: 5, x2: 30, y2: 5},
       {id: 1, type: LineTypes.SOLID, x1: 0, y1: 5, x2: 30, y2: 5, flipped: false, leftExtended: false, rightExtended: false},
-      {id: 2, type: LineTypes.ACC, x1: 30, y1: 5, x2: 0, y2: 5, flipped: true, leftExtended: true, rightExtended: true}
+      {id: 2, type: LineTypes.ACC, x1: 30, y1: 5, x2: 0, y2: 10, flipped: true, leftExtended: true, rightExtended: true}
     ]
 
     let engine = new LineRiderEngine()
@@ -134,6 +134,8 @@ test('LineRiderEngine', (t) => {
       start: DEFAULT_START,
       lines: lines
     }, 'correct json')
+
+    t.deepEqual(engine.getBoundingBox(), [0, 5, 30, 10], 'correct bounding box')
 
     t.end()
   })

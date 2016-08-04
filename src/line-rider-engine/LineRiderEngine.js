@@ -1,5 +1,6 @@
 import {setupImmo} from '../Immo.js'
 import LineEngine from '../line-engine'
+import LineSpace from '../line-space'
 
 import {ITERATE, GRAVITY, DEFAULT_START_POSITION, DEFAULT_START_VELOCITY} from './constants.js'
 import Rider from './rider.js'
@@ -22,6 +23,11 @@ export default class LineRiderEngine extends LineEngine {
         position: DEFAULT_START_POSITION,
         velocity: DEFAULT_START_VELOCITY
       }
+    }
+  }
+  __computed__ () {
+    return {
+      lineSpace: new LineSpace(({p1: {x: x1, y: y1}, p2: {x: x2, y: y2}}) => [x1, y1, x2, y2])
     }
   }
 
@@ -59,6 +65,15 @@ export default class LineRiderEngine extends LineEngine {
   }
 
   /* private */
+  _addLine (line) {
+    super._addLine(line)
+    this.lineSpace.addLine(line)
+  }
+  _removeLine (line) {
+    super._removeLine(line)
+    this.lineSpace.removeLine(line)
+  }
+
   makeRider () {
     return new Rider()
   }
@@ -67,10 +82,21 @@ export default class LineRiderEngine extends LineEngine {
     return new ClassicGrid(...args)
   }
 
-  /* not implemented rn */
-  // selectLinesInBox ([x0, y0, x1, y1])
-  // selectLinesInRadius ({x, y}, r)
-  // selectClosestLineInRadius ({x, y}, r)
-  // getBoundingBox ()
+  selectLinesInBox (x0, y0, x1, y1) {
+    this.updateComputed()
+    return this.lineSpace.selectLinesInBox(x0, y0, x1, y1)
+  }
+  selectLinesInRadius (c, r) {
+    this.updateComputed()
+    return this.lineSpace.selectLinesInRadius(c, r)
+  }
+  selectClosestLineInRadius (c, r) {
+    this.updateComputed()
+    return this.lineSpace.selectClosestLineInRadius(c, r)
+  }
+  getBoundingBox () {
+    this.updateComputed()
+    return this.lineSpace.getBoundingBox()
+  }
 }
 setupImmo(LineRiderEngine)
