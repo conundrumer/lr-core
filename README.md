@@ -7,8 +7,11 @@ This repository contains the core libary for Line Rider:
 Some helper libraries:
 
 - `V2`: simple 2d vectors
+- `G2`: geometry helpers
 - `Immo`: Immutable Manually Managed Objects
+- `OrderedObjectArray`: A collection for sorted objects in an array
 - `LineEngine`: A framework for deterministic grid-based physics engines with efficient recomputation
+- `LineSpace`: A data structure for efficient spatial querying of lines
 
 And some utility functions:
 
