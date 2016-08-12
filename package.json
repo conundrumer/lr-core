@@ -1,6 +1,6 @@
 {
   "name": "lr-core",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Line Rider core library",
   "main": "index.js",
   "scripts": {

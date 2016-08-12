@@ -1,4 +1,4 @@
-import classicRiderBody from './rider.json'
+import classicRiderBody from './rider-data'
 import * as States from './states'
 import * as Constraints from './constraints'
 import V2 from '../v2'

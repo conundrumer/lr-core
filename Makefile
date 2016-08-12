@@ -9,8 +9,10 @@ BUILD_CMD = ./node_modules/.bin/babel --presets es2015-node
 TEST_CMD := node
 
 SRC_FILES := $(call rwildcard,$(SRC)/,*.js) $(call rwildcard,$(SRC)/,*.json)
-BUILD_FILES := $(patsubst $(SRC)/%, $(BUILD)/%, $(SRC_FILES))
+BUILD_FILES := $(patsubst %.json, %.js, $(patsubst $(SRC)/%, $(BUILD)/%, $(SRC_FILES)))
 TEST_RESULT_FILES := $(patsubst $(SRC)/%.spec.js, $(TEST)/%.tap, $(SRC_FILES))
+
+JSON_HEADER := 'module.exports ='
 
 all: build unit-test
 
@@ -22,9 +24,10 @@ $(BUILD)/%.js: $(SRC)/%.js
 	@echo Build: $< \> $@
 	@mkdir -p $(@D)
 	@$(BUILD_CMD) $< > $@
-$(BUILD)/%.json: $(SRC)/%.json
+$(BUILD)/%.js: $(SRC)/%.json
+	@echo Build: $< \> $@
 	@mkdir -p $(@D)
-	cp $< $@
+	@echo $(JSON_HEADER) > $@ && cat $< >> $@
 
 unit-test: $(TEST_RESULT_FILES)
 $(TEST)/%.tap: $(BUILD)/%.spec.js $(BUILD)/%.js
