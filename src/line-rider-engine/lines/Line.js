@@ -11,6 +11,18 @@ export default class Line {
     return false
   }
 
+  get x1 () {
+    return this.p1.x
+  }
+  get y1 () {
+    return this.p1.y
+  }
+  get x2 () {
+    return this.p2.x
+  }
+  get y2 () {
+    return this.p2.y
+  }
   get vec () {
     return V2(this.p2).sub(this.p1)
   }
@@ -28,6 +40,13 @@ export default class Line {
   }
   get norm () {
     return V2(this.vec).rotCW().mul(this.invLength * (this.flipped ? -1 : 1))
+  }
+
+  equals (line) {
+    return this.id === line.id &&
+      this.type === line.type &&
+      this.p1.equals(line.p1) &&
+      this.p2.equals(line.p2)
   }
 
   toJSON () {

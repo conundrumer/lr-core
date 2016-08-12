@@ -98,6 +98,13 @@ export default class SolidLine extends Line {
     return p.updateState({pos, prevPos})
   }
 
+  equals (line) {
+    return super.equals(line) &&
+      this.flipped === line.flipped &&
+      this.leftExtended === line.leftExtended &&
+      this.rightExtended === line.rightExtended
+  }
+
   toJSON () {
     let {flipped, leftExtended, rightExtended} = this
     return Object.assign(super.toJSON(), {flipped, leftExtended, rightExtended})
