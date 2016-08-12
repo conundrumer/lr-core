@@ -2,18 +2,18 @@
 
 This repository contains the core libary for Line Rider:
 
-- `LineRiderEngine`: Backwards compatible physics engine for Line Rider
+- `line-rider-engine`: Backwards compatible physics engine for Line Rider
 
 Some helper libraries:
 
-- `V2`: simple 2d vectors
-- `G2`: geometry helpers
-- `Immo`: Immutable Manually Managed Objects
-- `OrderedObjectArray`: A collection for sorted objects in an array
-- `LineEngine`: A framework for deterministic grid-based physics engines with efficient recomputation
-- `LineSpace`: A data structure for efficient spatial querying of lines
+- `v2`: simple 2d vectors
+- `g2`: geometry helpers
+- `immo`: Immutable Manually Managed Objects
+- `ordered-object-array`: A collection for sorted objects in an array
+- `line-engine`: A framework for deterministic grid-based physics engines with efficient recomputation
+- `line-space`: A data structure for efficient spatial querying of lines
 
-And some utility functions:
+And some utility functions in `utils`:
 
 - `dda`: digital differential analyzer (draws a line using pixels) for floating point coordinates
 - `hashNumberPair`: functions that map every pair of integers to a unique integer

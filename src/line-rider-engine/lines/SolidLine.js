@@ -1,4 +1,4 @@
-import V2 from '../../V2.js'
+import V2 from '../../v2'
 
 import Line from './Line.js'
 import LineTypes from './LineTypes.js'

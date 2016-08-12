@@ -1,6 +1,6 @@
 import test from 'tape'
 
-import * as G2 from './G2.js'
+import * as G2 from './g2'
 
 // let almostEq = (a, b) => Math.abs(a - b) < 1e-9
 

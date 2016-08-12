@@ -1,6 +1,6 @@
 import test from 'tape'
 
-import V2, * as V2Fn from './V2.js'
+import V2, * as V2Fn from './v2'
 
 let v1 = {x: 1, y: 2}
 let v2 = {x: -2, y: 1}

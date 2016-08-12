@@ -1,4 +1,4 @@
-import {setupImmo} from '../Immo.js'
+import {setupImmo} from '../immo'
 import LineEngine from '../line-engine'
 import LineSpace from '../line-space'
 

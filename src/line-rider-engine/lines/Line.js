@@ -1,4 +1,4 @@
-import V2 from '../../V2.js'
+import V2 from '../../v2'
 
 export default class Line {
   constructor ({id, x1, y1, x2, y2}) {

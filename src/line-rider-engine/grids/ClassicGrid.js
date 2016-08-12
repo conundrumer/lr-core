@@ -1,6 +1,6 @@
 import {classicCells as getCellsFromLine} from './getCellsFromLine.js'
-import {hashIntPair} from '../../hashNumberPair.js'
-import OrderedObjectArray from '../../ordered-object-array.js'
+import {hashIntPair} from '../../utils/hashNumberPair.js'
+import OrderedObjectArray from '../../ordered-object-array'
 
 const GRID_SIZE = 14
 

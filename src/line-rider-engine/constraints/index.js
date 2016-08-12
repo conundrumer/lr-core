@@ -1,4 +1,4 @@
-import V2 from '../../V2.js'
+import V2 from '../../v2'
 
 function stickResolve (p1, p2, diff) {
   let delta = V2(p1.pos).sub(p2.pos).mul(diff)
