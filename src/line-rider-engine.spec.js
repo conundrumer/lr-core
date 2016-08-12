@@ -140,6 +140,22 @@ test('LineRiderEngine', (t) => {
     t.end()
   })
 
+  t.test('does not cause stack overflow for recomputation', t => {
+    const line = createLineFromJson({id: 2, type: 0, x1: -113.5, x2: 39.5, y1: 12.75, y2: 8.25})
+    const INDEX = 50
+
+    let engine = new LineRiderEngine()
+    void engine.getRider(INDEX)
+
+    try {
+      void engine.addLine(line)
+    } catch (e) {
+      t.fail(e)
+    }
+
+    t.end()
+  })
+
   t.end()
 })
 
