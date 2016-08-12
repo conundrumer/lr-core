@@ -1,6 +1,6 @@
 {
   "name": "lr-core",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Line Rider core library",
   "main": "index.js",
   "scripts": {
@@ -32,7 +32,8 @@
   },
   "dependencies": {
     "immy": "^0.4.0",
-    "lodash": "^4.13.1"
+    "lodash": "^4.13.1",
+    "mori": "^0.3.2"
   },
   "optionalDependencies": {}
 }
