@@ -52,9 +52,9 @@ test('LineRiderEngine', (t) => {
       .addLine(createLineFromJson(LINE2))
 
     let rider = engine.getRider(INDEX)
-    let shoulder = rider.stateMap.get('SHOULDER')
-    let butt = rider.stateMap.get('BUTT')
-    let nose = rider.stateMap.get('NOSE')
+    let shoulder = rider.get('SHOULDER')
+    let butt = rider.get('BUTT')
+    let nose = rider.get('NOSE')
 
     t.ok(
       shoulder.pos.x > 0 && nose.pos.x < 0,
@@ -169,7 +169,7 @@ test.skip('LineRiderEngine Compatibility', (t) => {
 
     let riderCrashed = engine
       .getRider(track.duration)
-      .stateMap.get('RIDER_MOUNTED')
+      .get('RIDER_MOUNTED')
       .framesSinceUnbind
     t.equal(track.duration - riderCrashed, 1 + track.duration, 'rider should not have crashed')
     t.end()
@@ -180,10 +180,10 @@ test.skip('LineRiderEngine Compatibility', (t) => {
       t.comment('Crashing at frame 63: line extensions have not been implemented')
       t.comment('Crashing at frame 86: no grid is being used')
       t.comment('Crashing at frame 433: order of lines is backwards')
-      t.equal(engine.getRider(416).stateMap.get('TAIL').pos.x, 804.1054060579701, 'frame 416 tail should be consistent')
-      t.equal(engine.getRider(416).stateMap.get('NOSE').pos.x, 813.3255772705486, 'frame 416 nose should be consistent')
-      t.equal(engine.getRider(417).stateMap.get('TAIL').pos.x, 797.8845320873339, 'frame 417 tail should be consistent')
-      t.equal(engine.getRider(417).stateMap.get('NOSE').pos.x, 810.0876743591476, 'frame 417 nose should be consistent')
+      t.equal(engine.getRider(416).get('TAIL').pos.x, 804.1054060579701, 'frame 416 tail should be consistent')
+      t.equal(engine.getRider(416).get('NOSE').pos.x, 813.3255772705486, 'frame 416 nose should be consistent')
+      t.equal(engine.getRider(417).get('TAIL').pos.x, 797.8845320873339, 'frame 417 tail should be consistent')
+      t.equal(engine.getRider(417).get('NOSE').pos.x, 810.0876743591476, 'frame 417 nose should be consistent')
       // printSim(engine, 2, 416)
       t.end()
     })

@@ -32,7 +32,9 @@ export default class Rider {
     return {
       position: averageVectors(points.map(({pos}) => pos)),
       velocity: averageVectors(points.map(({vel}) => vel)),
-      stateMap
+      get (id) {
+        return stateMap.get(id)
+      }
     }
   }
 }
