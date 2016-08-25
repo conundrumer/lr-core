@@ -1,10 +1,11 @@
 import {classicCells as getCellsFromLine} from './getCellsFromLine.js'
 import {hashIntPair} from '../../utils/hashNumberPair.js'
+import {SubclassableMap} from '../../subclassable'
 import OrderedObjectArray from '../../ordered-object-array'
 
 const GRID_SIZE = 14
 
-class LineCellsMap extends Map {
+class LineCellsMap extends SubclassableMap {
   add (line, cells) {
     this.set(line.id, cells)
   }
@@ -16,7 +17,7 @@ class LineCellsMap extends Map {
   }
 }
 
-class CellLinesMap extends Map {
+class CellLinesMap extends SubclassableMap {
   add (line, cells) {
     for (let cell of cells) {
       let cellLines = this.get(cell)

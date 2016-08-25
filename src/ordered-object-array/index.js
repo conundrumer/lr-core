@@ -1,15 +1,13 @@
 import sortedIndexBy from 'lodash/sortedIndexBy.js'
 
-function OrderedObjectArrayConstructor (key, descending = false) {
-  this._key = key
-  this._getID = descending ? obj => -obj[this._key] : obj => obj[this._key]
-  this._set = new Set()
-}
+import {SubclassableArray} from '../subclassable'
 
-export default class OrderedObjectArray extends Array {
-  constructor (...args) {
+export default class OrderedObjectArray extends SubclassableArray {
+  constructor (key, descending = false) {
     super()
-    OrderedObjectArrayConstructor.call(this, ...args)
+    this._key = key
+    this._getID = descending ? obj => -obj[this._key] : obj => obj[this._key]
+    this._set = new Set()
   }
   getIndexOf (obj) {
     return sortedIndexBy(this.toArray(), obj, this._getID)
@@ -31,43 +29,4 @@ export default class OrderedObjectArray extends Array {
       this.splice(index, 1)
     }
   }
-
-  toArray () {
-    return this
-  }
-}
-
-class OrderedObjectArrayNonSubclassed {
-  constructor (...args) {
-    OrderedObjectArrayConstructor.call(this, ...args)
-    this._array = []
-  }
-  toArray () {
-    return this._array
-  }
-  get length () {
-    return this._array.length
-  }
-  splice (...args) {
-    return this._array.splice(...args)
-  }
-  filter (...args) {
-    return this._array.filter(...args)
-  }
-  [Symbol.iterator] () {
-    return this._array[Symbol.iterator]()
-  }
-}
-
-const ARRAY_SUBCLASSABLE = (() => {
-  class C extends Array {}
-  var c = new C()
-  var len1 = c.length
-  c[2] = 'foo'
-  var len2 = c.length
-  return len1 === 0 && len2 === 3
-})()
-
-if (ARRAY_SUBCLASSABLE) {
-  Object.assign(OrderedObjectArray.prototype, OrderedObjectArrayNonSubclassed.prototype)
 }
