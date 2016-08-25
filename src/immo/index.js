@@ -43,13 +43,13 @@ export default class Immo {
         set: (next) => { current = next }
       },
       __props__: {
-        value: Object.assign(new.target.__props__.call(this), props)
+        value: Object.assign(this.constructor.__props__.call(this), props)
       },
       __state__: {
-        value: Object.assign(new.target.__state__.call(this), state)
+        value: Object.assign(this.constructor.__state__.call(this), state)
       },
       __computed__: {
-        value: Object.assign(new.target.__computed__.call(this), computed)
+        value: Object.assign(this.constructor.__computed__.call(this), computed)
       }
     })
   }
