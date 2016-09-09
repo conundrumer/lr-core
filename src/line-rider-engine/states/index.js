@@ -30,10 +30,13 @@ export class Point extends Immo {
       }
     })
   }
+  getNextPos (vel) {
+    return V2(this.pos).add(vel)
+  }
   step ({gravity}) {
     let vel = V2(this.pos).sub(this.prevPos).mul(1 - this.airFriction).add(gravity)
     return this.updateState({
-      pos: V2(this.pos).add(vel),
+      pos: this.getNextPos(vel),
       prevPos: this.pos,
       vel: vel
     })
@@ -53,10 +56,29 @@ export class CollisionPoint extends Point {
 }
 setupImmo(CollisionPoint)
 
+// based on the canonical glsl rand
+// returns a psuedorandom number between 0 and 1
+const V = { x: 12.9898, y: 78.233 }
+const K = 43758.5453
+function rand (seed) {
+  return (Math.sin(V2.dot(seed, V)) * K) % 1
+}
+const INTENSITY = 2
+const SPEED_THRESHOLD = 40 // as this gets smaller, the scarf intensifies faster while speed increases
 export class FlutterPoint extends Point {
-  step (gravity) {
-    let next = super.step(gravity)
-    return next
+  static getFlutter (vel, seed) {
+    let speed = Math.pow(V2.lenSq(vel), 0.25)
+    let randMag = rand(vel)
+    let randAng = rand(seed)
+    randMag *= INTENSITY * speed * -Math.expm1(-speed / SPEED_THRESHOLD)
+    randAng *= 2 * Math.PI
+    return {
+      x: randMag * Math.cos(randAng),
+      y: randMag * Math.sin(randAng)
+    }
+  }
+  getNextPos (vel) {
+    return V2(this.pos).add(vel).add(FlutterPoint.getFlutter(vel, this.pos))
   }
 }
 
