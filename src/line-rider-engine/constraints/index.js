@@ -9,6 +9,10 @@ function stickResolve (p1, p2, diff) {
   ]
 }
 
+function getDiff (restLength, length) {
+  return length === 0 ? 0 : (length - restLength) / length
+}
+
 export class Stick {
   get iterating () {
     return true
@@ -20,7 +24,7 @@ export class Stick {
   }
 
   getDiff (length) {
-    return length === 0 ? 0 : (length - this.length) / length * 0.5
+    return getDiff(this.length, length) * 0.5
   }
 
   resolve (stateMap) {
@@ -82,9 +86,29 @@ export class DirectedChain {
     return false
   }
 
-  constructor ({id, ps}) {
-    Object.assign(this, {id, ps})
+  constructor ({id, ps}, initialStateMap) {
+    let [, ...points] = ps
+    let lengths = points.map((id, i) =>
+      V2.dist(initialStateMap.get(id).pos, initialStateMap.get(ps[i]).pos)
+    )
+    Object.assign(this, {id, ps, lengths})
   }
 
-  resolve () { return [] }
+  resolve (stateMap) {
+    let points = this.ps.map(id => stateMap.get(id))
+
+    for (let i = 1; i < points.length; i++) {
+      let p0 = points[i - 1]
+      let p1 = points[i]
+      let restLength = this.lengths[i - 1]
+      let length = V2.dist(p0.pos, p1.pos)
+      let nextPosition = V2(p0.pos).sub(p1.pos).mul(getDiff(restLength, length)).add(p1.pos)
+
+      points[i] = p1.setPosition(nextPosition)
+    }
+
+    [, ...points] = points
+
+    return points
+  }
 }
