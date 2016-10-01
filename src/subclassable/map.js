@@ -15,11 +15,10 @@ const MAP_SUBCLASSABLE = (() => {
   class M extends Map {}
   try {
     var map = new M()
+    map.set(key, 123)
   } catch (e) {
     return false
   }
-
-  map.set(key, 123)
 
   return map instanceof M && map.has(key) && map.get(key) === 123
 })()
