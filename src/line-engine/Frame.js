@@ -1,4 +1,3 @@
-import mori from 'mori'
 import Immy from 'immy'
 
 class CellFrame {
@@ -29,7 +28,7 @@ function addEntityToCellFrames (cellFrames, index, entity) {
 }
 
 export default class Frame {
-  constructor (stateMap = new Map(), grid = mori.hashMap(), collisions = mori.hashMap(), updates = []) {
+  constructor (stateMap = new Map(), grid = new Immy.Map(), collisions = new Immy.Map(), updates = []) {
     this.stateMap = stateMap
     this.grid = grid
     this.collisions = collisions
@@ -41,8 +40,8 @@ export default class Frame {
   }
 
   getIndexOfCollisionInCell (cell, line) {
-    let cellFrames = mori.get(this.grid, cell)
-    if (!cellFrames) return
+    if (!this.grid.has(cell)) return
+    let cellFrames = this.grid.get(cell)
     for (let i = 0; i < cellFrames.size(); i++) {
       let cellFrame = cellFrames.get(i)
       if (cellFrame.hasCollisionWith(line)) {
@@ -52,7 +51,7 @@ export default class Frame {
   }
 
   getIndexOfCollisionWithLine (line) {
-    let lineCollisions = mori.get(this.collisions, line.id)
+    let lineCollisions = this.collisions.get(line.id)
     if (lineCollisions) {
       return lineCollisions.get(0)
     }
@@ -72,18 +71,18 @@ export default class Frame {
   addToGrid (lineGrid, entity, index) {
     let cells = lineGrid.getCellsNearEntity(entity)
     for (let cell of cells) {
-      let cellFrames = mori.get(this.grid, cell)
+      let cellFrames = this.grid.get(cell)
       if (!cellFrames) {
         cellFrames = makeCellFrames(index, entity)
       } else {
         cellFrames = addEntityToCellFrames(cellFrames, index, entity)
       }
-      this.grid = mori.assoc(this.grid, cell, cellFrames)
+      this.grid = this.grid.withKeySetToValue(cell, cellFrames)
     }
   }
 
   addToCollisions (line, index) {
-    let lineCollisions = mori.get(this.collisions, line.id)
+    let lineCollisions = this.collisions.get(line.id)
     if (!lineCollisions) {
       lineCollisions = new Immy.List([index])
     } else if (lineCollisions.get(lineCollisions.size() - 1) !== index) {
@@ -91,6 +90,6 @@ export default class Frame {
     } else {
       return
     }
-    this.collisions = mori.assoc(this.collisions, line.id, lineCollisions)
+    this.collisions = this.collisions.withKeySetToValue(line.id, lineCollisions)
   }
 }
