@@ -3,7 +3,7 @@ import LineEngine from '../line-engine'
 import LineSpace from '../line-space'
 
 import {ITERATE, GRAVITY, DEFAULT_START_POSITION, DEFAULT_START_VELOCITY} from './constants.js'
-import Rider from './rider.js'
+import Rider from './Rider.js'
 import {ClassicGrid} from './grids'
 
 // @setupImmo
