@@ -107,6 +107,7 @@ export class Binding extends Immo {
     } else if (!bind && this.isBinded()) {
       return this.updateState({framesSinceUnbind: 0})
     }
+    return this
   }
   step () {
     if (this.isBinded()) {

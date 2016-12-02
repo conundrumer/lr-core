@@ -39,10 +39,10 @@ export default function printSim (engine, length, start = 0) {
     i += start
     let rider = engine.getRider(i)
     let points = IDs.map((id) =>
-      rider.stateMap.get(id).pos
+      rider.get(id).pos
     ).map(({x, y}) => [x, y])
     .reduce((a, b) => [...a, ...b])
-    return [...a, ...b, [i, 'FrameEnd', '', rider.stateMap.get('RIDER_MOUNTED').isBinded(), ...points]]
+    return [...a, ...b, [i, 'FrameEnd', '', rider.get('RIDER_MOUNTED').isBinded(), ...points]]
   }, [])
 
   let t = new Table()

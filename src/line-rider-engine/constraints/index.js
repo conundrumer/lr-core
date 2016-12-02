@@ -61,9 +61,7 @@ export class BindStick extends Stick {
     let p2 = stateMap.get(this.p2)
     let length = V2.dist(p1.pos, p2.pos)
     let diff = this.getDiff(length)
-    // console.log('diff', diff)
     if (diff > this.endurance) {
-      // console.log('true')
       return [binding.setBind(false)]
     }
     return stickResolve(p1, p2, diff)
@@ -79,7 +77,20 @@ export class BindJoint {
     Object.assign(this, {id, p1, p2, q1, q2, binding})
   }
 
-  resolve () { return [] }
+  resolve (stateMap) {
+    let p1 = stateMap.get(this.p1)
+    let p2 = stateMap.get(this.p2)
+    let q1 = stateMap.get(this.q1)
+    let q2 = stateMap.get(this.q2)
+    let binding = stateMap.get(this.binding)
+    // allow kramuals
+    if (V2.cross(V2(p2.pos).sub(p1.pos), V2(q2.pos).sub(q1.pos)) >= 0) {
+      return []
+    } else if (binding.isBinded()) {
+      return [binding.setBind(false)]
+    }
+    return []
+  }
 }
 export class DirectedChain {
   get iterating () {
