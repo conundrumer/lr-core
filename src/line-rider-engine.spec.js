@@ -159,8 +159,8 @@ test('LineRiderEngine', (t) => {
   t.end()
 })
 
-test.skip('LineRiderEngine Compatibility', (t) => {
-  const runTestTrack = (trackPath, legacy, extraTest = () => {}) => (t) => {
+test('LineRiderEngine Compatibility', (t) => {
+  const runTestTrack = (trackPath, {shouldCrash = false, legacy = false, extraTest = () => {}}) => (t) => {
     let track = require(trackPath)
     let engine = (legacy ? new CustomLineRiderEngine({legacy: true}) : new LineRiderEngine())
       .setStart(track.startPosition)
@@ -171,36 +171,51 @@ test.skip('LineRiderEngine Compatibility', (t) => {
       .getRider(track.duration)
       .get('RIDER_MOUNTED')
       .framesSinceUnbind
-    t.equal(track.duration - riderCrashed, 1 + track.duration, 'rider should not have crashed')
+    if (shouldCrash) {
+      t.ok(riderCrashed > 0, 'rider should have crashed')
+    } else {
+      t.equal(track.duration - riderCrashed, 1 + track.duration, 'rider should not have crashed')
+    }
     t.end()
   }
 
-  t.test('test track', runTestTrack('../fixtures/testTrack.track.json', false, (t, engine) => {
-    t.skip('extra tests for test track', t => {
-      t.comment('Crashing at frame 63: line extensions have not been implemented')
-      t.comment('Crashing at frame 86: no grid is being used')
-      t.comment('Crashing at frame 433: order of lines is backwards')
-      t.equal(engine.getRider(416).get('TAIL').pos.x, 804.1054060579701, 'frame 416 tail should be consistent')
-      t.equal(engine.getRider(416).get('NOSE').pos.x, 813.3255772705486, 'frame 416 nose should be consistent')
-      t.equal(engine.getRider(417).get('TAIL').pos.x, 797.8845320873339, 'frame 417 tail should be consistent')
-      t.equal(engine.getRider(417).get('NOSE').pos.x, 810.0876743591476, 'frame 417 nose should be consistent')
-      // printSim(engine, 2, 416)
-      t.end()
-    })
+  t.skip('test track', runTestTrack('../fixtures/testTrack.track.json', {
+    extraTest: (t, engine) => {
+      t.skip('extra tests for test track', t => {
+        t.comment('Crashing at frame 63: line extensions have not been implemented')
+        t.comment('Crashing at frame 86: no grid is being used')
+        t.comment('Crashing at frame 433: order of lines is backwards')
+        t.equal(engine.getRider(416).get('TAIL').pos.x, 804.1054060579701, 'frame 416 tail should be consistent')
+        t.equal(engine.getRider(416).get('NOSE').pos.x, 813.3255772705486, 'frame 416 nose should be consistent')
+        t.equal(engine.getRider(417).get('TAIL').pos.x, 797.8845320873339, 'frame 417 tail should be consistent')
+        t.equal(engine.getRider(417).get('NOSE').pos.x, 810.0876743591476, 'frame 417 nose should be consistent')
+        // printSim(engine, 2, 416)
+        t.end()
+      })
+    }
   }))
 
-  t.test('cycloid', runTestTrack('../fixtures/cycloid.track.json', false, (t) => {
-    t.skip('extra tests for cycloid', t => {
-      t.comment('Crashing at frame 146: using dda instead of classic cells')
-      t.end()
-    })
+  t.skip('cycloid', runTestTrack('../fixtures/cycloid.track.json', {
+    extraTest: (t) => {
+      t.skip('extra tests for cycloid', t => {
+        t.comment('Crashing at frame 146: using dda instead of classic cells')
+        t.end()
+      })
+    }
   }))
 
-  t.test('legacy test track', runTestTrack('../fixtures/legacyTestTrack.track.json', true, (t) => {
-    t.skip('extra tests for legacy test track', t => {
-      t.comment('Crashing at frame 862: not using legacy cells')
-      t.end()
-    })
+  t.skip('legacy test track', runTestTrack('../fixtures/legacyTestTrack.track.json', {
+    legacy: true,
+    extraTest: (t) => {
+      t.skip('extra tests for legacy test track', t => {
+        t.comment('Crashing at frame 862: not using legacy cells')
+        t.end()
+      })
+    }
+  }))
+
+  t.test('cripple track', runTestTrack('../fixtures/cripple.track.json', {
+    shouldCrash: true
   }))
 
   t.end()
