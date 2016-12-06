@@ -1,6 +1,6 @@
 {
   "name": "lr-core",
-  "version": "0.7.3",
+  "version": "0.8.0",
   "description": "Line Rider core library",
   "main": "index.js",
   "scripts": {
@@ -28,7 +28,7 @@
     "babel-preset-es2015-node": "^6.1.0",
     "easy-table": "^1.0.0",
     "standard": "^7.1.1",
-    "tape": "^4.5.1"
+    "tape": "^4.6.3"
   },
   "dependencies": {
     "immy": "^0.4.1",

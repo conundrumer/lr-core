@@ -15,8 +15,14 @@ test('LineSpace', t => {
   const LINE_2 = {id: 2, x1: 0, y1: 0, x2: 3, y2: 4}
   let space = new LineSpace(({x1, y1, x2, y2}) => [x1, y1, x2, y2])
 
-  const tester = ({method, params = [], expected}) =>
-    t.deepEquals(space[method](...params), expected, `${method}: ${JSON.stringify(params)}`)
+  const tester = ({method, params = [], expected}) => {
+    let result = space[method](...params)
+    if (expected instanceof Array) {
+      // convert SubclassableArray to Array
+      result = Array.from(result)
+    }
+    t.deepEquals(result, expected, `${method}: ${JSON.stringify(params)}`)
+  }
 
   t.comment('0 lines')
   ;[{

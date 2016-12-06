@@ -1,0 +1,57 @@
+{
+"label": "cripple",
+"creator": "",
+"description": "",
+"version": "6.2",
+"startPosition": {
+"x": 0,
+"y": 0
+},
+"duration": 40,
+"lines": [
+{
+"id": 1,
+"type": 0,
+"x1": 14.80679895339713,
+"y1": 2.0527811527946573,
+"x2": 39.40646003678954,
+"y2": -0.04452565360469496,
+"flipped": false,
+"leftExtended": false,
+"rightExtended": false
+},
+{
+"id": 2,
+"type": 0,
+"x1": -0.8793082027980308,
+"y1": 32.201566494785354,
+"x2": 30.27443665059235,
+"y2": 26.827217803387015,
+"flipped": false,
+"leftExtended": false,
+"rightExtended": false
+},
+{
+"id": 3,
+"type": 0,
+"x1": 20.268535428395445,
+"y1": 24.686217105187673,
+"x2": 28.657762653992854,
+"y2": 28.880830717986377,
+"flipped": false,
+"leftExtended": false,
+"rightExtended": false
+},
+{
+"id": 4,
+"type": 0,
+"x1": 30.27443665059235,
+"y1": 26.827217803387015,
+"x2": 56.147491385604155,
+"y2": 26.20582610058339,
+"flipped": false,
+"leftExtended": false,
+"rightExtended": false
+}
+]
+}
