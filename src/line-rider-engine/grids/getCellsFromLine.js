@@ -41,7 +41,10 @@ class ClassicCells {
       getNextPos = this.getNextPos
     }
 
-    let addNextCell = (cellPos, pos) => {
+    let cellPos = cellPosStart
+    let pos = { x: line.p1.x, y: line.p1.y }
+
+    while (cellPos != null) {
       let d = this.getDelta(line, cellPos, gridSize)
 
       let nextPos = getNextPos(line, pos.x, pos.y, d.x, d.y)
@@ -49,11 +52,12 @@ class ClassicCells {
 
       if (inBounds(nextCellPos, box)) {
         cellsPos.push(nextCellPos)
-        addNextCell(nextCellPos, nextPos)
+        cellPos = nextCellPos
+        pos = nextPos
+      } else {
+        cellPos = null
       }
     }
-
-    addNextCell(cellPosStart, { x: line.p1.x, y: line.p1.y })
 
     return cellsPos
   }
