@@ -49,6 +49,11 @@ class ClassicCells {
 
       let nextPos = getNextPos(line, pos.x, pos.y, d.x, d.y)
       let nextCellPos = getCellPosAndOffset(nextPos.x, nextPos.y, gridSize)
+      if (nextCellPos.x === cellPos.x && nextCellPos.y === cellPos.y) {
+        // 6.1 grid screws up on rare occasions
+        // this would crash the flash version, so it's undefined and we'll just bail
+        break
+      }
 
       if (inBounds(nextCellPos, box)) {
         cellsPos.push(nextCellPos)
